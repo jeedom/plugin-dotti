@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<info>
+    <id>dotti</id>
+    <name>Dotti</name>
+    <description>Plugin pour piloter le Dotti</description>
+    <icon>fa fa-keyboard-o</icon>
+    <licence>AGPL</licence>
+    <author>Ludovic Sarakha et Loïc Gevrey</author>
+    <installation>Aucune</installation>
+    <require>2.4</require>
+    <category>communication</category>
+</info>
+
