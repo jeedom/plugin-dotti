@@ -24,6 +24,25 @@ class dotti extends eqLogic {
 
 	/*     * ***********************Methode static*************************** */
 
+	public static function dependancy_info() {
+		$return = array();
+		$return['log'] = 'dotti_update';
+		$return['progress_file'] = '/tmp/dependancy_dotti_in_progress';
+		if (exec('which hcitool | wc -l') != 0) {
+			$return['state'] = 'ok';
+		} else {
+			$return['state'] = 'nok';
+		}
+		return $return;
+	}
+
+	public static function dependancy_install() {
+		log::remove('dotti_update');
+		$cmd = 'sudo /bin/bash ' . dirname(__FILE__) . '/../../ressources/install.sh';
+		$cmd .= ' >> ' . log::getPathToLog('dotti_update') . ' 2>&1 &';
+		exec($cmd);
+	}
+
 	/*     * *********************Méthodes d'instance************************* */
 
 	/*     * **********************Getteur Setteur*************************** */
