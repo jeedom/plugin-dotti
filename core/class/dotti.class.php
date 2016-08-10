@@ -74,6 +74,14 @@ class dotti extends eqLogic {
 		$cmd->save();
 	}
 
+	public static function generateJson($_data, $_options = array()) {
+		$_options['data'] = $_data;
+		if (file_exists('/tmp/dotti.json')) {
+			shell_exec('sudo rm /tmp/dotti.json');
+		}
+		file_put_contents('/tmp/dotti.json', $_options);
+	}
+
 	/*     * **********************Getteur Setteur*************************** */
 }
 
