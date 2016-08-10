@@ -45,6 +45,35 @@ class dotti extends eqLogic {
 
 	/*     * *********************Méthodes d'instance************************* */
 
+	public function postSave() {
+		$cmd = $this->getCmd(null, 'sendtext');
+		if (!is_object($cmd)) {
+			$cmd = new dottiCmd();
+			$cmd->setLogicalId('sendtext');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Afficher text', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('message');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
+		$cmd->save();
+
+		$cmd = $this->getCmd(null, 'sendraw');
+		if (!is_object($cmd)) {
+			$cmd = new dottiCmd();
+			$cmd->setLogicalId('sendraw');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Afficher', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('message');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
+		$cmd->setDisplay('message_placeholder', __('Données brute en json', __FILE__));
+		$cmd->save();
+	}
+
 	/*     * **********************Getteur Setteur*************************** */
 }
 
