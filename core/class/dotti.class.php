@@ -43,6 +43,51 @@ class dotti extends eqLogic {
 		exec($cmd);
 	}
 
+	public static function text2array($_text, $_color = 0xFFFFFF, $_displaySize = array(8, 8)) {
+		$image = imagecreatetruecolor($_displaySize[0] + 1, $_displaySize[1] + 1);
+		imagefill($image, 0, 0, 0x000000);
+		imagestring($image, 1, 0, 0, $_text, $_color);
+		$return = array();
+		for ($x = 0; $x < imagesy($image); $x++) {
+			for ($y = 0; $y < imagesx($image); $y++) {
+				$rgb = imagecolorat($image, $y, $x);
+				$r = ($rgb >> 16) & 0xFF;
+				$g = ($rgb >> 8) & 0xFF;
+				$b = $rgb & 0xFF;
+				$return[$x][$y] = array($r, $g, $b);
+			}
+		}
+		$column_black = true;
+		foreach ($return as $x => $line) {
+			if ($line[0][0] != 0 || $line[0][0] != 0 || $line[0][0] != 0) {
+				$column_black = false;
+				break;
+			}
+		}
+		foreach ($return as $x => &$line) {
+			if ($column_black) {
+				array_shift($line);
+			} else {
+				array_pop($line);
+			}
+		}
+		array_pop($return);
+		return $return;
+	}
+
+	public static function array2table($_array) {
+		$return = '<table>';
+		foreach ($_array as $x => $line) {
+			$return .= '<tr>';
+			foreach ($line as $y => $color) {
+				$return .= '<td style="Background-Color:RGB(' . $color[0] . ',' . $color[1] . ',' . $color[2] . ');height:40px;width:40px;"></td>';
+			}
+			$return .= '</tr>';
+		}
+		$return .= '<table>';
+		return $return;
+	}
+
 	/*     * *********************Méthodes d'instance************************* */
 
 	public function postSave() {
