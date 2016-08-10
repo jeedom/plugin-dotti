@@ -138,7 +138,10 @@ class dottiCmd extends cmd {
 	/*     * *********************Methode d'instance************************* */
 
 	public function execute($_options = array()) {
-
+		$eqLogic = $this->getEqLogic();
+		if ($this->getLogicalId() == 'sendtext') {
+			$eqLogic->getCmd('sendraw')->execCmd(array('title' => '', 'message' => dotti::text2array($_options['message'])));
+		}
 	}
 
 	/*     * **********************Getteur Setteur*************************** */
