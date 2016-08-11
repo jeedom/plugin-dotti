@@ -43,18 +43,19 @@ class dotti extends eqLogic {
 		exec($cmd);
 	}
 
-	public static function text2array($_text, $_color = 0xFFFFFF, $_displaySize = array(8, 8)) {
+	public static function text2array($_text, $_color = 'FFFFFF', $_displaySize = array(8, 8)) {
 		$image = imagecreatetruecolor($_displaySize[0] + 1, $_displaySize[1] + 1);
+		$rgbcolor = hex2rgb($_color);
 		imagefill($image, 0, 0, 0x000000);
-		imagestring($image, 1, 0, 0, $_text, $_color);
+		imagestring($image, 1, 0, 0, $_text, 0xFFFFFF);
 		$return = array();
 		for ($x = 0; $x < imagesy($image); $x++) {
 			for ($y = 0; $y < imagesx($image); $y++) {
-				$rgb = imagecolorat($image, $y, $x);
-				$r = ($rgb >> 16) & 0xFF;
-				$g = ($rgb >> 8) & 0xFF;
-				$b = $rgb & 0xFF;
-				$return[$x][$y] = array($r, $g, $b);
+				if (imagecolorat($image, $y, $x) != 0) {
+					$return[$x][$y] = array($rgbcolor[0], $rgbcolor[1], $rgbcolor[2]);
+				} else {
+					$return[$x][$y] = array(0, 0, 0);
+				}
 			}
 		}
 		$column_black = true;
@@ -104,6 +105,18 @@ class dotti extends eqLogic {
 		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
 		$cmd->save();
 
+		$cmd = $this->getCmd(null, 'blackscreen');
+		if (!is_object($cmd)) {
+			$cmd = new dottiCmd();
+			$cmd->setLogicalId('blackscreen');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Ecran noir', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('other');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+
 		$cmd = $this->getCmd(null, 'sendraw');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();
@@ -121,15 +134,35 @@ class dotti extends eqLogic {
 
 	public function generateJson($_data, $_options = array()) {
 		$file = '/tmp/dotti' . str_replace(':', '', $this->getConfiguration('mac')) . '.json';
-		$_options['data'] = $_data;
+		$data = array();
+		$i = 1;
+		if (isset($_data[0]) && is_array($_data[0])) {
+			foreach ($_data as $x => $line) {
+				foreach ($line as $y => $color) {
+					$data[$i] = $color;
+					$i++;
+				}
+			}
+		} else {
+			$data = $_data;
+		}
+		$_options['data'] = $data;
 		if (file_exists($file)) {
 			shell_exec('sudo rm ' . $file);
 		}
-		file_put_contents($file, $_options);
+		file_put_contents($file, json_encode($_options, JSON_FORCE_OBJECT));
 	}
 
 	public function sendData($_data, $_options = array()) {
 		$this->generateJson($_data, $_options);
+		$cmd = 'sudo python ' . dirname(__FILE__) . '/../../resources/dottiset.py ' . $this->getConfiguration('mac') . ' 2>&1';
+		$result = shell_exec($cmd);
+		if (trim($result) != 'OK') {
+			$result = shell_exec($cmd);
+		}
+		if (trim($result) != 'OK') {
+			throw new Exception('[Dotti] ' . $result);
+		}
 	}
 
 	/*     * **********************Getteur Setteur*************************** */
@@ -145,7 +178,18 @@ class dottiCmd extends cmd {
 	public function execute($_options = array()) {
 		$eqLogic = $this->getEqLogic();
 		if ($this->getLogicalId() == 'sendtext') {
-			$eqLogic->sendData(dotti::text2array($_options['message']));
+			$options = arg2array($_options['title']);
+			if (!isset($options['color'])) {
+				$options['color'] = 'FFFFFF';
+			}
+			$eqLogic->sendData(dotti::text2array($_options['message'], $options['color']));
+		}
+		if ($this->getLogicalId() == 'blackscreen') {
+			$data = array();
+			for ($i = 1; $i < 65; $i++) {
+				$data[$i] = array(0, 0, 0);
+			}
+			$eqLogic->sendData($data);
 		}
 	}
 
