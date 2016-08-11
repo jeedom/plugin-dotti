@@ -14,7 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
-
+bt_dottiScreen
+$('#bt_dottiScreen').on('click', function () {
+    $('#md_modal').dialog({title: "{{Dessiner}}"});
+    $('#md_modal').load('index.php?v=d&plugin=dotti&modal=dottiScreen').dialog('open');
+});
 
 $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
 /*

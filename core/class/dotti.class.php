@@ -97,7 +97,7 @@ class dotti extends eqLogic {
 			$cmd = new dottiCmd();
 			$cmd->setLogicalId('sendtext');
 			$cmd->setIsVisible(1);
-			$cmd->setName(__('Afficher', __FILE__));
+			$cmd->setName(__('Afficher text', __FILE__));
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('message');
@@ -116,13 +116,41 @@ class dotti extends eqLogic {
 		$cmd->setSubType('other');
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
+		
+		$cmd = $this->getCmd(null, 'loadid');
+		if (!is_object($cmd)) {
+			$cmd = new dottiCmd();
+			$cmd->setLogicalId('loadid');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Charger Image', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('message');
+        $cmd->setDisplay('title_disable', 1);
+        $cmd->setDisplay('message_placeholder', __('ID (0 à 255)', __FILE__));
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+		
+		$cmd = $this->getCmd(null, 'saveid');
+		if (!is_object($cmd)) {
+			$cmd = new dottiCmd();
+			$cmd->setLogicalId('saveid');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Sauver Image', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('message');
+        $cmd->setDisplay('title_disable', 1);
+        $cmd->setDisplay('message_placeholder', __('ID (0 à 255)', __FILE__));
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
 
 		$cmd = $this->getCmd(null, 'sendraw');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();
 			$cmd->setLogicalId('sendraw');
 			$cmd->setIsVisible(1);
-			$cmd->setName(__('Afficher brute', __FILE__));
+			$cmd->setName(__('Afficher', __FILE__));
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('message');
@@ -177,26 +205,25 @@ class dottiCmd extends cmd {
 
 	public function execute($_options = array()) {
 		$eqLogic = $this->getEqLogic();
-		if ($this->getLogicalId() == 'sendtext') {
+		$logicalId = $this->getLogicalId();
+		if ($logicalId == 'sendtext') {
 			$options = arg2array($_options['title']);
 			if (!isset($options['color'])) {
 				$options['color'] = 'FFFFFF';
 			}
 			$eqLogic->sendData(dotti::text2array($_options['message'], $options['color']));
 		}
-		if ($this->getLogicalId() == 'blackscreen') {
+		if ($logicalId == 'blackscreen') {
 			$data = array();
 			for ($i = 1; $i < 65; $i++) {
 				$data[$i] = array(0, 0, 0);
 			}
 			$eqLogic->sendData($data);
 		}
-		if ($this->getLogicalId() == 'sendraw') {
-			$options = arg2array($_options['message']);
+		if (in_array($logicalId, array('loadid','saveid'))) {
 			$data = array();
-			foreach ($options as $key => $value) {
-				$data[$key] = hex2rgb($value);
-			}
+			$data['type'] = $logicalId;
+			$data['id'] = $_options['message'];
 			$eqLogic->sendData($data);
 		}
 	}

@@ -92,6 +92,12 @@ foreach (object::all() as $object) {
             <input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="mac" />
         </div>
     </div>
+	<div class="form-group">
+	<label class="col-sm-4 control-label">{{Dessiner}}</label>
+		<div class="col-sm-4">
+		<a class="btn btn-warning" id="bt_dottiScreen"><i class="fa fa-refresh"></i> {{Dessiner}}</a>
+	</div>
+             </div>
 </fieldset>
 </form>
   </div>

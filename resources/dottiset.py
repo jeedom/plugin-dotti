@@ -39,13 +39,20 @@ except Exception as err:
 
 try:
 	newch = btle.Characteristic(conn, btle.UUID('fff3'), 0x29, 8, 0x2A)
-	for pixel in display['data']:
-		try:
+	if 'type' in display['data']:
+		memoryid = display['data']['id']
+		if display['data']['type'] == 'loadid':
+			newch.write(struct.pack('<BBBBBB', 0x06, 0x08, 0x02,int(memoryid),0x00,0x00))
+		elif display['data']['type'] == 'saveid':
+			newch.write(struct.pack('<BBBBBB', 0x06, 0x07, 0x02,int(memoryid),0x00,0x00))
+	else:
+		for pixel in display['data']:
+			try:
 				newch.write(struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(display['data'][pixel]['0']), int(display['data'][pixel]['1']), int(display['data'][pixel]['2'])))
-		except Exception as err:
-				time.sleep(0.3)
+			except Exception as err:
+				time.sleep(0.05)
 				newch.write(struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(display['data'][pixel]['0']), int(display['data'][pixel]['1']), int(display['data'][pixel]['2'])))
-		time.sleep(0.3)
+			time.sleep(0.05)
 except Exception as err:
 	print(err)
 
