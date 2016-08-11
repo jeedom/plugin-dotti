@@ -76,6 +76,34 @@ class dotti extends eqLogic {
 		return $return;
 	}
 
+	public static function number2line($_number, $_line = 1) {
+		$return = array();
+		$colors = array(
+			1000 => '#FF0000',
+			100 => '#FFFF00',
+			10 => '#00FF00',
+			1 => '#FFFFFF',
+		);
+		$start = ($_line - 1) * 8 + 1;
+		$i = 0;
+		for ($j = 0; $j < 8; $j++) {
+			$return[$start + $j] = array(0, 0, 0);
+		}
+		foreach ($colors as $key => $color) {
+			if (($_number / $key) >= 1) {
+				for ($j = 1; $j <= ($_number / $key); $j++) {
+					$return[$start + $i] = hex2rgb($color);
+					if ($i == 8) {
+						break (2);
+					}
+					$i++;
+				}
+				$_number = $_number - (round($_number / $key, 0, PHP_ROUND_HALF_DOWN) * $key);
+			}
+		}
+		return $return;
+	}
+
 	public static function array2table($_array) {
 		$return = '<table>';
 		foreach ($_array as $x => $line) {
@@ -116,7 +144,21 @@ class dotti extends eqLogic {
 		$cmd->setSubType('other');
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
-		
+
+		$cmd = $this->getCmd(null, 'rownumber');
+		if (!is_object($cmd)) {
+			$cmd = new dottiCmd();
+			$cmd->setLogicalId('rownumber');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Nombre en ligne', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('message');
+		$cmd->setDisplay('title_placeholder', __('Ligne', __FILE__));
+		$cmd->setDisplay('message_placeholder', __('Nombre', __FILE__));
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+
 		$cmd = $this->getCmd(null, 'loadid');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();
@@ -126,11 +168,11 @@ class dotti extends eqLogic {
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('message');
-        $cmd->setDisplay('title_disable', 1);
-        $cmd->setDisplay('message_placeholder', __('ID (0 à 255)', __FILE__));
+		$cmd->setDisplay('title_disable', 1);
+		$cmd->setDisplay('message_placeholder', __('ID (0 à 255)', __FILE__));
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
-		
+
 		$cmd = $this->getCmd(null, 'saveid');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();
@@ -140,8 +182,8 @@ class dotti extends eqLogic {
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('message');
-        $cmd->setDisplay('title_disable', 1);
-        $cmd->setDisplay('message_placeholder', __('ID (0 à 255)', __FILE__));
+		$cmd->setDisplay('title_disable', 1);
+		$cmd->setDisplay('message_placeholder', __('ID (0 à 255)', __FILE__));
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
 
@@ -220,7 +262,22 @@ class dottiCmd extends cmd {
 			}
 			$eqLogic->sendData($data);
 		}
-		if (in_array($logicalId, array('loadid','saveid'))) {
+		if ($logicalId == 'rownumber') {
+			if (!is_numeric($_options['message'])) {
+				throw new Exception(__('Le champs message doit être un numérique : ', __FILE__) . $_options['message']);
+			}
+			$line = 1;
+			if (is_numeric($_options['title'])) {
+				$line = $_options['title'];
+			} else {
+				$options = arg2array($_options['title']);
+				if (!isset($options['line'])) {
+					$line = $options['line'];
+				}
+			}
+			$eqLogic->sendData(dotti::number2line($_options['message'], $line));
+		}
+		if (in_array($logicalId, array('loadid', 'saveid'))) {
 			$data = array();
 			$data['type'] = $logicalId;
 			$data['id'] = $_options['message'];
