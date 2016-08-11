@@ -93,7 +93,7 @@ class dotti extends eqLogic {
 			if (($_number / $key) >= 1) {
 				for ($j = 1; $j <= ($_number / $key); $j++) {
 					$return[$start + $i] = hex2rgb($color);
-					if ($i == 8) {
+					if ($i == 7) {
 						break (2);
 					}
 					$i++;
