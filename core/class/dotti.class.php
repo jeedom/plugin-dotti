@@ -191,6 +191,14 @@ class dottiCmd extends cmd {
 			}
 			$eqLogic->sendData($data);
 		}
+		if ($this->getLogicalId() == 'sendraw') {
+			$options = arg2array($_options['message']);
+			$data = array();
+			foreach ($options as $key => $value) {
+				$data[$key] = hex2rgb($value);
+			}
+			$eqLogic->sendData($data);
+		}
 	}
 
 	/*     * **********************Getteur Setteur*************************** */
