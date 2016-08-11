@@ -119,12 +119,17 @@ class dotti extends eqLogic {
 		$cmd->save();
 	}
 
-	public static function generateJson($_data, $_options = array()) {
+	public function generateJson($_data, $_options = array()) {
+		$file = '/tmp/dotti' . str_replace(':', '', $this->getConfiguration('mac')) . '.json';
 		$_options['data'] = $_data;
-		if (file_exists('/tmp/dotti.json')) {
-			shell_exec('sudo rm /tmp/dotti.json');
+		if (file_exists($file)) {
+			shell_exec('sudo rm ' . $file);
 		}
-		file_put_contents('/tmp/dotti.json', $_options);
+		file_put_contents($file, $_options);
+	}
+
+	public function sendData($_data, $_options = array()) {
+		$this->generateJson($_data, $_options);
 	}
 
 	/*     * **********************Getteur Setteur*************************** */
@@ -140,7 +145,7 @@ class dottiCmd extends cmd {
 	public function execute($_options = array()) {
 		$eqLogic = $this->getEqLogic();
 		if ($this->getLogicalId() == 'sendtext') {
-			$eqLogic->getCmd('sendraw')->execCmd(array('title' => '', 'message' => dotti::text2array($_options['message'])));
+			$eqLogic->sendData(dotti::text2array($_options['message']));
 		}
 	}
 
