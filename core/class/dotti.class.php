@@ -97,7 +97,7 @@ class dotti extends eqLogic {
 			$cmd = new dottiCmd();
 			$cmd->setLogicalId('sendtext');
 			$cmd->setIsVisible(1);
-			$cmd->setName(__('Afficher text', __FILE__));
+			$cmd->setName(__('Afficher', __FILE__));
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('message');
@@ -122,7 +122,7 @@ class dotti extends eqLogic {
 			$cmd = new dottiCmd();
 			$cmd->setLogicalId('sendraw');
 			$cmd->setIsVisible(1);
-			$cmd->setName(__('Afficher', __FILE__));
+			$cmd->setName(__('Afficher brute', __FILE__));
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('message');
