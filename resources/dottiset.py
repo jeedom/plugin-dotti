@@ -36,11 +36,12 @@ try:
 except Exception as err:
 	time.sleep(1)
 	conn = btle.Peripheral(device_mac, btle.ADDR_TYPE_PUBLIC)
-	
+
 try:
 	newch = btle.Characteristic(conn, btle.UUID('fff3'), 0x29, 8, 0x2A)
 	for pixel in display['data']:
-		newch.write(struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(display['data'][pixel]['0']), int(display['data'][pixel]['1']), int(display['data'][pixel]['2'])),withResponse=False)
+		newch.write(struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(display['data'][pixel]['0']), int(display['data'][pixel]['1']), int(display['data'][pixel]['2'])))
+		time.sleep(0.3)
 except Exception as err:
 	print(err)
 
