@@ -98,7 +98,7 @@ class dotti extends eqLogic {
 					}
 					$i++;
 				}
-				$_number = $_number - (round($_number / $key, 0, PHP_ROUND_HALF_DOWN) * $key);
+				$_number = $_number - (floor($_number / $key) * $key);
 			}
 		}
 		return $return;
