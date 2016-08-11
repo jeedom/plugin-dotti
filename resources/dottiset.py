@@ -21,10 +21,6 @@ if not os.path.isfile(btle.helperExe):
 	raise ImportError("Cannot find required executable '%s'" % btle.helperExe)
 
 device_mac = sys.argv[1]
-if len(sys.argv) == 3:
-	address_type = sys.argv[2]
-else:
-	address_type = btle.ADDR_TYPE_PUBLIC
 
 json_path = '/tmp/dotti'+device_mac.replace(':','')+'.json'
 
@@ -35,12 +31,16 @@ with open(json_path) as data_file:
 	display = json.load(data_file)
 
 
-conn = btle.Peripheral(device_mac, address_type)
+try:
+	conn = btle.Peripheral(device_mac, btle.ADDR_TYPE_PUBLIC)
+except Exception as err:
+	time.sleep(1)
+	conn = btle.Peripheral(device_mac, btle.ADDR_TYPE_PUBLIC)
+	
 try:
 	newch = btle.Characteristic(conn, btle.UUID('fff3'), 0x29, 8, 0x2A)
 	for pixel in display['data']:
-		newch.write(struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(display['data'][pixel]['0']), int(display['data'][pixel]['1']), int(display['data'][pixel]['2'])))
-		time.sleep(0.20)
+		newch.write(struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(display['data'][pixel]['0']), int(display['data'][pixel]['1']), int(display['data'][pixel]['2'])),withResponse=False)
 except Exception as err:
 	print(err)
 
