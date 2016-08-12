@@ -372,17 +372,16 @@ class dotti extends eqLogic {
 
 	public function sendData($_type, $_data) {
 		if ($_type == 'display') {
-			echo 'je passe';
-			$data = array();
 			if (isset($_data[0]) && is_array($_data[0])) {
+				$data = array();
 				foreach ($_data as $x => $line) {
 					foreach ($line as $y => $color) {
 						$data[$i] = $color;
 						$i++;
 					}
 				}
+				$_data = $data;
 			}
-			$_data = $data;
 		}
 		$value = json_encode(array('apikey' => config::byKey('api'), 'type' => $_type, 'data' => $_data, 'mac' => $this->getConfiguration('mac')), JSON_FORCE_OBJECT);
 		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
