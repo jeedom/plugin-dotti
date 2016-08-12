@@ -227,7 +227,11 @@ class dotti extends eqLogic {
 		$this->generateJson($_data, $_options);
 		$cmd = 'sudo python ' . dirname(__FILE__) . '/../../resources/dottiset.py ' . $this->getConfiguration('mac') . ' 2>&1';
 		$result = shell_exec($cmd);
-		if (trim($result) != 'OK') {
+		for ($i = 0; $i < 4; $i++) {
+			if (trim($result) == 'OK') {
+				break;
+			}
+			sleep(1);
 			$result = shell_exec($cmd);
 		}
 		if (trim($result) != 'OK') {
