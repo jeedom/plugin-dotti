@@ -225,7 +225,8 @@ logging.info('Device : '+str(_device))
 logging.info('Macs : '+str(_macs))
 
 if not os.path.isfile(btle.helperExe):
-	raise ImportError("Cannot find required executable '%s'" % btle.helperExe)
+	logging.error("Cannot find required executable '%s'" % btle.helperExe)
+	shutdown()
 
 if not _macs == '':
 	_macs = string.split(_macs, ',')
