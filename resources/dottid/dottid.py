@@ -50,12 +50,12 @@ def connect(mac=None):
 		
 	try:
 		logging.debug("(1) Try connect to " + str(mac))
-		DOTTIS[mac]['connection'] = btle.Peripheral(mac, btle.ADDR_TYPE_PUBLIC)
+		DOTTIS[mac]['connection'] = btle.Peripheral(mac)
 	except Exception as err:
 		time.sleep(1)
 		try:
 			logging.debug("(2) Try connect to " + str(mac))
-			DOTTIS[mac]['connection'] = btle.Peripheral(mac, btle.ADDR_TYPE_PUBLIC)
+			DOTTIS[mac]['connection'] = btle.Peripheral(mac)
 		except Exception as err:
 			logging.error('Connection error on '+ str(mac) +' => '+str(err))
 			return
