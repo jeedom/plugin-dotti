@@ -170,7 +170,7 @@ def shutdown():
 	logging.debug("Shutdown")
 	logging.debug("Disconnect from all dotti")
 	for mac in DOTTIS:
-		if DOTTIS[mac] is None:
+		if DOTTIS[mac]['connection'] is None:
 			continue
 		disconnect(mac)
 
