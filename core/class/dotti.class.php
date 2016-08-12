@@ -234,7 +234,7 @@ class dotti extends eqLogic {
 			sleep(1);
 			$result = shell_exec($cmd);
 		}
-		if (trim($result) != 'OK') {
+		if (trim($result) != 'OK' && $this->getConfiguration('noErrorOnFailed', 0) == 0) {
 			throw new Exception('[Dotti] ' . $result);
 		}
 	}
