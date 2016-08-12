@@ -350,7 +350,7 @@ class dotti extends eqLogic {
 		$cmd->setSubType('message');
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
-		$cmd->setDisplay('message_placeholder', __('Données brute en json', __FILE__));
+		$cmd->setDisplay('message_placeholder', __('Données brute', __FILE__));
 		$cmd->save();
 	}
 
