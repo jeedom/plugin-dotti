@@ -199,12 +199,12 @@ class dotti extends eqLogic {
 		foreach ($_data as $pixel => $color) {
 			$data[$pixel] = hex2rgb($color);
 		}
-		$dotti->sendData('display',$data);
+		$dotti->sendData('display', $data);
 	}
 
 	public static function loadDotti($_memory, $_id) {
 		$dotti = dotti::byId($_id);
-		$dotti->sendData('loadid',$_memory);
+		$dotti->sendData('loadid', $_memory);
 		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
 		$dataColor = array();
 		if (file_exists($file)) {
@@ -239,7 +239,7 @@ class dotti extends eqLogic {
 	public static function saveDotti($_memory, $_id, $_name, $_data) {
 		$dotti = dotti::byId($_id);
 		dotti::sendDataRealTime($_data, $_id);
-		$dotti->sendData('saveid',$_memory);
+		$dotti->sendData('saveid', $_memory);
 		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
 		$dataMemory = array();
 		if (file_exists($file)) {
@@ -334,7 +334,7 @@ class dotti extends eqLogic {
 		$cmd->setSubType('message');
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
-		$cmd->setDisplay('message_placeholder', __('Données brute en json', __FILE__));
+		$cmd->setDisplay('message_placeholder', __('Données brute', __FILE__));
 		$cmd->save();
 	}
 
@@ -393,6 +393,7 @@ class dottiCmd extends cmd {
 				$options['color'] = 'FFFFFF';
 			}
 			$eqLogic->sendData('display', dotti::text2array($_options['message'], $options['color']));
+			return;
 		}
 		if ($this->getLogicalId() == 'blackscreen') {
 			$data = array();
@@ -400,6 +401,7 @@ class dottiCmd extends cmd {
 				$data[$i] = array(0, 0, 0);
 			}
 			$eqLogic->sendData('display', $data);
+			return;
 		}
 		if ($this->getLogicalId() == 'rownumber') {
 			if (!is_numeric($_options['message'])) {
@@ -415,6 +417,16 @@ class dottiCmd extends cmd {
 				}
 			}
 			$eqLogic->sendData('display', dotti::number2line($_options['message'], $line));
+			return;
+		}
+		if ($this->getLogicalId() == 'sendraw') {
+			$options = arg2array($_options['message']);
+			$data = array();
+			foreach ($options as $key => $value) {
+				$data[$key] = hex2rgb($value);
+			}
+			$eqLogic->sendData('display', $data);
+			return;
 		}
 		if (in_array($this->getLogicalId(), array('loadid', 'saveid'))) {
 			if ($this->getLogicalId() == 'loadid') {
@@ -423,6 +435,7 @@ class dottiCmd extends cmd {
 				}
 			}
 			$eqLogic->sendData($this->getLogicalId(), $_options['message']);
+			return;
 		}
 	}
 
