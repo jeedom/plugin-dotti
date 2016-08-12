@@ -47,26 +47,21 @@ def connect(mac=None):
 
 	if mac in DOTTIS:
 		DOTTIS[mac] = {}
-
-	if mac in _macs : 
+		
+	try:
+		logging.debug("(1) Try connect to " + str(mac))
+		DOTTIS[mac]['connection'] = btle.Peripheral(mac, btle.ADDR_TYPE_PUBLIC)
+	except Exception as err:
+		time.sleep(1)
 		try:
-			logging.debug("(1) Try connect to " + str(mac))
+			logging.debug("(2) Try connect to " + str(mac))
 			DOTTIS[mac]['connection'] = btle.Peripheral(mac, btle.ADDR_TYPE_PUBLIC)
 		except Exception as err:
-			time.sleep(1)
-			try:
-				logging.debug("(2) Try connect to " + str(mac))
-				DOTTIS[mac]['connection'] = btle.Peripheral(mac, btle.ADDR_TYPE_PUBLIC)
-			except Exception as err:
-				logging.error('Connection error on '+ str(mac) +' => '+str(err))
-				return
-		logging.debug("Connection successfull on " + str(mac))		
-		DOTTIS[mac]['characteristic'] = btle.Characteristic(DOTTIS[mac], btle.UUID('fff3'), 0x29, 8, 0x2A)
-		DOTTIS[mac]['inUsed'] = False
-		return
-
-	logging.error('Device not allow : '+str(mac))
-	return None
+			logging.error('Connection error on '+ str(mac) +' => '+str(err))
+			return
+	logging.debug("Connection successfull on " + str(mac))		
+	DOTTIS[mac]['characteristic'] = btle.Characteristic(DOTTIS[mac], btle.UUID('fff3'), 0x29, 8, 0x2A)
+	return
 
 def disconnect(mac=None):
 	logging.debug("Disconnect from : " + str(mac))
@@ -83,16 +78,12 @@ def write(mac=None,message=None):
 	if mac is None or message is None:
 		logging.error('[write] mac and message arg can not be null')
 		return
-
+	logging.debug('Write message into '+str(mac))
 	if not mac in DOTTIS or DOTTIS[mac]['connection'] is None:
 		connect(mac)
 
 	if not mac in DOTTIS or DOTTIS[mac]['connection'] is None:
-		logging.error("Can not found or connect to "+str(mac))
-		return
-
-	DOTTIS[mac]['inUsed'] = True;
-
+		raise Exception("Can not found or connect to "+str(mac))
 	try:
 		DOTTIS[mac]['characteristic'].write(message)
 	except Exception as err:
@@ -100,28 +91,18 @@ def write(mac=None,message=None):
 		try:
 			DOTTIS[mac]['characteristic'].write(message)
 		except Exception as err:
-			DOTTIS[mac]['inUsed'] = False;
 			disconnect(mac)
 			logging.error('Write error on '+ str(mac)+' => '+str(err))
 
-	DOTTIS[mac]['inUsed'] = False;
-
 # ----------------------------------------------------------------------------
 
-def doJsonOnDotti(mac=None,jsonfile=None):
-	if mac is None or jsonfile is None:
-		logging.error('[doJsonOnDotti] mac and jsonfile arg can not be null')
+def display(mac=None,data=None):
+	if mac is None or data is None:
+		logging.error('[display] mac and data arg can not be null')
 		return
-	logging.debug('Write json '+str(jsonfile)+' into '+str(mac))
-	if not os.path.exists(jsonfile):
-		logging.error("Json file not found : "+jsonfile)
-		return
-
-	with open(jsonfile) as data_file:    
-		display = json.load(data_file)
-
-	for pixel in display['data']:
-		write(mac,struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(display['data'][pixel]['0']), int(display['data'][pixel]['1']), int(display['data'][pixel]['2'])))
+	logging.debug('Write display into '+str(mac))
+	for pixel, value in data.iteritems():
+		write(mac,struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(value[0]), int(value[1]), int(value[2])))
 		time.sleep(0.05)
 
 def loadid(mac=None,loadid=None):
@@ -149,16 +130,22 @@ def read_socket():
 		if message['apikey'] != _apikey:
 			logging.error("Invalid apikey from socket : " + str(message))
 			return
-		if 'mac' in message:
+		if not 'mac' in message:
 			logging.error("No mac address : " + str(message))
 			return
+		if not 'type' in message:
+			logging.error("No type : " + str(message))
+			return
+		if not 'data' in message:
+			logging.error("No data : " + str(message))
+			return
 		try:
-			if 'jsonfile' in message:
-				doJsonOnDotti(message['mac'],message['jsonfile'])
-			if 'loadid' in message:
-				loadid(message['mac'],message['loadid'])
-			if 'saveid' in message:
-				saveid(message['mac'],message['saveid'])
+			if message['type'] == 'display':
+				display(message['mac'],message['data'])
+			if message['type'] == 'loadid':
+				loadid(message['mac'],message['data'])
+			if message['type'] == 'saveid':
+				saveid(message['mac'],message['data'])
 		except Exception, e:
 			logging.error('Send command to dotti error : '+str(e))
 
@@ -168,7 +155,7 @@ def listen():
 		connect(mac)
 	try:
 		while 1:
-			time.sleep(0.5)
+			time.sleep(0.2)
 			read_socket()
 	except KeyboardInterrupt:
 		shutdown()
@@ -240,11 +227,10 @@ logging.info('Macs : '+str(_macs))
 if not os.path.isfile(btle.helperExe):
 	raise ImportError("Cannot find required executable '%s'" % btle.helperExe)
 
-if _macs == '':
-	logging.error('Macs can not be empty')
-	shutdown()
-else:
+if not _macs == '':
 	_macs = string.split(_macs, ',')
+else:
+	_macs = []
 
 signal.signal(signal.SIGINT, handler)
 signal.signal(signal.SIGTERM, handler)	

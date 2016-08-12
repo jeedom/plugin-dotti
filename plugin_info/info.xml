@@ -9,5 +9,7 @@
     <installation>Aucune</installation>
     <require>2.4</require>
     <category>communication</category>
+    <hasOwnDeamon>1</hasOwnDeamon>
+    <hasDependency>1</hasDependency>
 </info>
 

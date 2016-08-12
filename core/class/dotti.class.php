@@ -43,6 +43,82 @@ class dotti extends eqLogic {
 		exec($cmd);
 	}
 
+	public static function deamon_info() {
+		$return = array();
+		$return['log'] = 'dotti';
+		$return['state'] = 'nok';
+		$pid_file = '/tmp/dottid.pid';
+		if (file_exists($pid_file)) {
+			if (@posix_getsid(trim(file_get_contents($pid_file)))) {
+				$return['state'] = 'ok';
+			} else {
+				shell_exec('sudo rm -rf ' . $pid_file . ' 2>&1 > /dev/null;rm -rf ' . $pid_file . ' 2>&1 > /dev/null;');
+			}
+		}
+		$return['launchable'] = 'ok';
+		return $return;
+	}
+
+	public static function deamon_start() {
+		self::deamon_stop();
+		$deamon_info = self::deamon_info();
+		if ($deamon_info['launchable'] != 'ok') {
+			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
+		}
+		$dotti_path = realpath(dirname(__FILE__) . '/../../resources/dottid');
+		$cmd = '/usr/bin/python ' . $dotti_path . '/dottid.py';
+		$cmd .= ' --loglevel=' . log::convertLogLevel(log::getLogLevel('dotti'));
+		$cmd .= ' --socketport=' . config::byKey('socketport', 'dotti');
+
+		$macs = '';
+		foreach (self::byType('dotti') as $dotti) {
+			if ($dotti->getConfiguration('mac') == '') {
+				continue;
+			}
+			$macs .= $dotti->getConfiguration('mac') . ',';
+		}
+		if ($macs != '') {
+			$cmd .= ' --macs=' . trim($macs, ',');
+		}
+		if (config::byKey('jeeNetwork::mode') == 'slave') {
+			$cmd .= ' --sockethost=' . network::getNetworkAccess('internal', 'ip', '127.0.0.1');
+			$cmd .= ' --callback=' . config::byKey('jeeNetwork::master::ip') . '/plugins/dotti/core/php/jeeDotti.php';
+			$cmd .= ' --apikey=' . config::byKey('jeeNetwork::master::apikey');
+		} else {
+			$cmd .= ' --sockethost=127.0.0.1';
+			$cmd .= ' --callback=' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/dotti/core/php/jeeDotti.php';
+			$cmd .= ' --apikey=' . config::byKey('api');
+		}
+		log::add('dotti', 'info', 'Lancement démon dotti : ' . $cmd);
+		$result = exec($cmd . ' >> ' . log::getPathToLog('dotti') . ' 2>&1 &');
+		$i = 0;
+		while ($i < 30) {
+			$deamon_info = self::deamon_info();
+			if ($deamon_info['state'] == 'ok') {
+				break;
+			}
+			sleep(1);
+			$i++;
+		}
+		if ($i >= 30) {
+			log::add('dotti', 'error', 'Impossible de lancer le démon dotti', 'unableStartDeamon');
+			return false;
+		}
+		message::removeAll('dotti', 'unableStartDeamon');
+		return true;
+	}
+
+	public static function deamon_stop() {
+		$pid_file = '/tmp/dottid.pid';
+		if (file_exists($pid_file)) {
+			$pid = intval(trim(file_get_contents($pid_file)));
+			system::kill($pid);
+		}
+		system::kill('dottid.py');
+		system::fuserk(config::byKey('socketport', 'dotti'));
+		sleep(1);
+	}
+
 	public static function text2array($_text, $_color = 'FFFFFF', $_displaySize = array(8, 8)) {
 		$image = imagecreatetruecolor($_displaySize[0] + 1, $_displaySize[1] + 1);
 		$rgbcolor = hex2rgb($_color);
@@ -202,41 +278,25 @@ class dotti extends eqLogic {
 		$cmd->save();
 	}
 
-	public function generateJson($_data, $_options = array()) {
-		$file = '/tmp/dotti' . str_replace(':', '', $this->getConfiguration('mac')) . '.json';
-		$data = array();
-		$i = 1;
-		if (isset($_data[0]) && is_array($_data[0])) {
-			foreach ($_data as $x => $line) {
-				foreach ($line as $y => $color) {
-					$data[$i] = $color;
-					$i++;
+	public function sendData($_type, $_data) {
+		if ($_type == 'diplay') {
+			$data = array();
+			if (isset($_data[0]) && is_array($_data[0])) {
+				foreach ($_data as $x => $line) {
+					foreach ($line as $y => $color) {
+						$data[$i] = $color;
+						$i++;
+					}
 				}
 			}
-		} else {
-			$data = $_data;
+			$_data = $data;
 		}
-		$_options['data'] = $data;
-		if (file_exists($file)) {
-			shell_exec('sudo rm ' . $file);
-		}
-		file_put_contents($file, json_encode($_options, JSON_FORCE_OBJECT));
-	}
 
-	public function sendData($_data, $_options = array()) {
-		$this->generateJson($_data, $_options);
-		$cmd = 'sudo python ' . dirname(__FILE__) . '/../../resources/dottiset.py ' . $this->getConfiguration('mac') . ' 2>&1';
-		$result = shell_exec($cmd);
-		for ($i = 0; $i < 4; $i++) {
-			if (trim($result) == 'OK') {
-				break;
-			}
-			sleep(1);
-			$result = shell_exec($cmd);
-		}
-		if (trim($result) != 'OK' && $this->getConfiguration('noErrorOnFailed', 0) == 0) {
-			throw new Exception('[Dotti] ' . $result);
-		}
+		$value = json_encode(array('apikey' => config::byKey('api'), 'type' => $_type, 'data' => $_data, 'mac' => $this->getConfiguration('mac')));
+		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
+		socket_connect($socket, '127.0.0.1', config::byKey('socketport', 'dotti'));
+		socket_write($socket, $value, strlen($value));
+		socket_close($socket);
 	}
 
 	/*     * **********************Getteur Setteur*************************** */
@@ -251,22 +311,21 @@ class dottiCmd extends cmd {
 
 	public function execute($_options = array()) {
 		$eqLogic = $this->getEqLogic();
-		$logicalId = $this->getLogicalId();
-		if ($logicalId == 'sendtext') {
+		if ($this->getLogicalId() == 'sendtext') {
 			$options = arg2array($_options['title']);
 			if (!isset($options['color'])) {
 				$options['color'] = 'FFFFFF';
 			}
-			$eqLogic->sendData(dotti::text2array($_options['message'], $options['color']));
+			$eqLogic->sendData('display', dotti::text2array($_options['message'], $options['color']));
 		}
-		if ($logicalId == 'blackscreen') {
+		if ($this->getLogicalId() == 'blackscreen') {
 			$data = array();
 			for ($i = 1; $i < 65; $i++) {
 				$data[$i] = array(0, 0, 0);
 			}
-			$eqLogic->sendData($data);
+			$eqLogic->sendData('display', $data);
 		}
-		if ($logicalId == 'rownumber') {
+		if ($this->getLogicalId() == 'rownumber') {
 			if (!is_numeric($_options['message'])) {
 				throw new Exception(__('Le champs message doit être un numérique : ', __FILE__) . $_options['message']);
 			}
@@ -279,13 +338,10 @@ class dottiCmd extends cmd {
 					$line = $options['line'];
 				}
 			}
-			$eqLogic->sendData(dotti::number2line($_options['message'], $line));
+			$eqLogic->sendData('display', dotti::number2line($_options['message'], $line));
 		}
-		if (in_array($logicalId, array('loadid', 'saveid'))) {
-			$data = array();
-			$data['type'] = $logicalId;
-			$data['id'] = $_options['message'];
-			$eqLogic->sendData($data);
+		if (in_array($this->getLogicalId(), array('loadid', 'saveid'))) {
+			$eqLogic->sendData($this->getLogicalId(), $_options['message']);
 		}
 	}
 
