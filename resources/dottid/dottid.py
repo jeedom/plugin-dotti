@@ -92,6 +92,8 @@ def write(mac=None,message=None):
 	except Exception as err:
 		time.sleep(0.05)
 		try:
+			disconnect(mac)
+			connect(mac)
 			DOTTIS[mac]['characteristic'].write(message)
 		except Exception as err:
 			disconnect(mac)
