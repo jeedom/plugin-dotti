@@ -101,12 +101,6 @@ foreach (object::all() as $object) {
           </div>
         </div>
         <div class="form-group">
-          <label class="col-sm-3 control-label">{{Pas d'erreur sur échec}}</label>
-          <div class="col-sm-3">
-            <input type="checkbox" class="eqLogicAttr configuration" data-l1key="configuration" data-l2key="noErrorOnFailed" />
-          </div>
-        </div>
-        <div class="form-group">
          <label class="col-sm-3 control-label">{{Dessiner}}</label>
          <div class="col-sm-4">
           <a class="btn btn-warning" id="bt_dottiScreen"><i class="fa fa-refresh"></i> {{Dessiner}}</a>
