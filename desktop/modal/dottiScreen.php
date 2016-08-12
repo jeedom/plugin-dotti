@@ -93,9 +93,13 @@ $('#bt_saveDotti').on('click', function () {
 	 $('.pixel').each(function( index ) {
 		 array[$(this).attr('data-pixel')] = hexc($(this).css('color'));
 	});
+	if ($('.name').val() == ''){
+		$('.eventDisplay').showAlert({message:  'Vous devez spécifier un nom pour sauver une image',level: 'danger'});
+		return;
+	}
 	bootbox.dialog({
             title: 'Etes-vous sur ?',
-            message: 'Vous allez sauver l\'image dans la mémoire "' + $('.memorysave').find('option:selected').text() + '" ! Voulez-vous continuer ?',
+            message: 'Vous allez sauver l\'image dans la mémoire "' + $('.memorysave').find('option:selected').text() + '" avec le nom : ' +$('.name').val() +' ! Voulez-vous continuer ?',
             buttons: {
                 "{{Annuler}}": {
                     className: "btn-danger",
@@ -106,6 +110,7 @@ $('#bt_saveDotti').on('click', function () {
                     label: "{{Continuer}}",
                     className: "btn-success",
                     callback: function () {
+						$('.eventDisplay').showAlert({message:  'Sauvegarde en cours ...',level: 'warning'});
                         $.ajax({// fonction permettant de faire de l'ajax
 			type: "POST", // methode de transmission des données au fichier php
 			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
