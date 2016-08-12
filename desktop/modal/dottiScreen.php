@@ -24,12 +24,19 @@ if (init('id') == '') {
 sendVarToJS('id', init('id'));
 ?>
 <div class="eventDisplay"></div>
-Couleur<label class="fa fa-circle pixelCircle" style="color : #000000;font-size:2em; margin-top:10px;margin-left:15px; cursor: pointer;"><input class="pixelcolor" type="color" value="#000000" style="width:0;height:0;visibility:hidden"></label>
-<a class="btn btn-warning" id="bt_fill"><i class="fa fa-refresh"></i> {{Remplir}}</a>
-<label class="checkbox-inline pull-right"><input class="realtime" type="checkbox" unchecked />{{Temps réel}}</label>
-<a class="btn btn-warning pull-right" id="bt_sendAll"><i class="fa fa-refresh"></i> {{Envoyer l'image}}</a>
-<a class="btn btn-warning pull-right" id="bt_saveDotti"><i class="fa fa-refresh"></i> {{Sauver l'image}}</a>
-<a class="btn btn-warning pull-right" id="bt_loadDotti"><i class="fa fa-refresh"></i> {{Charger une image}}</a>
+ <div class="col-lg-2">
+ <div class="form-group">
+<span style="margin-right:15px;"><label class="fa fa-circle pixelCircle" style="color : #000000;font-size:2em; margin-top:10px;margin-left:15px; cursor: pointer;"><input class="pixelcolor" type="color" value="#000000" style="width:0;height:0;visibility:hidden"></label>{{Couleur}}</span>
+<a class="btn btn-xs btn-danger" id="bt_fill"><i class="fa fa-tint"></i> {{Remplir}}</a>
+</div>
+<div class="form-group">
+
+</div>
+<div class="form-group">
+<label class="checkbox-inline"><input class="realtime" type="checkbox" unchecked />{{Temps réel}}</label>
+</div>
+</div>
+ <div class="col-lg-8">
 <center>
 	<?php
 	$i=1;
@@ -45,41 +52,40 @@ Couleur<label class="fa fa-circle pixelCircle" style="color : #000000;font-size:
 	}
      ?>
 </center>
-<div>
+</div>
+<center>
+ <div class="col-lg-2">
+ <div class="form-group">
+<a class="btn btn-warning" id="bt_sendAll"><i class="fa fa-refresh"></i> {{Afficher sur le Dotti}}</a></br>
+</div>
+<div class="form-group">
+	<label class="control-label">{{Nom de l'image}}</label>
+   <input class="name form-control" id="texte" type='text'/>
+   <select class="memorysave form-control" style="margin-top:5px">
    <?php
-   echo '<div class="form-group">
-        <label class=" control-label">Mémoire à charger</label>
-        <div class="col-lg-3">
-        <select class="memoryload" style="margin-top:5px">';
         $i = 0;
         while ($i < 256) {
           echo '<option value="' . $i . '">{{Mémoire ' . $i . '}}</option>';
           $i++;
         }
-
-
-        echo '</select> </div>
-        </div>';
-		?>
+	?>
+		</select>
+		<a class="btn btn-success" id="bt_saveDotti"><i class="fa fa-refresh"></i> {{Sauver l'image}}</a>
 </div>
-<div>
-   Nom de l'image <input class="name" id="texte" type='text'/> 
+<div class="form-group">
+<select class="memoryload form-control" style="margin-top:5px">
    <?php
-   echo '<div class="form-group">
-        <label class=" control-label">Mémoire à Sauver</label>
-        <div class="col-lg-3">
-        <select class="memorysave" style="margin-top:5px">';
         $i = 0;
         while ($i < 256) {
           echo '<option value="' . $i . '">{{Mémoire ' . $i . '}}</option>';
           $i++;
         }
-
-
-        echo '</select> </div>
-        </div>';
-		?>
+	?>
+</select>
+<a class="btn btn-danger" id="bt_loadDotti"><i class="fa fa-refresh"></i> {{Charger une image}}</a>
 </div>
+</div>
+</center>
 <script>
 loadMemoryList(id);
 $('#bt_saveDotti').on('click', function () {
@@ -87,7 +93,20 @@ $('#bt_saveDotti').on('click', function () {
 	 $('.pixel').each(function( index ) {
 		 array[$(this).attr('data-pixel')] = hexc($(this).css('color'));
 	});
-	$.ajax({// fonction permettant de faire de l'ajax
+	bootbox.dialog({
+            title: 'Etes-vous sur ?',
+            message: 'Vous allez sauver l\'image dans la mémoire "' + $('.memorysave').find('option:selected').text() + '" ! Voulez-vous continuer ?',
+            buttons: {
+                "{{Annuler}}": {
+                    className: "btn-danger",
+                    callback: function () {
+                    }
+                },
+                success: {
+                    label: "{{Continuer}}",
+                    className: "btn-success",
+                    callback: function () {
+                        $.ajax({// fonction permettant de faire de l'ajax
 			type: "POST", // methode de transmission des données au fichier php
 			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
 			data: {
@@ -97,6 +116,7 @@ $('#bt_saveDotti').on('click', function () {
 				memory: $('.memorysave').value(),
 				data : array
 			},
+			global : false,
 			dataType: 'json',
 			error: function(request, status, error) {
 				handleAjaxError(request, status, error);
@@ -106,10 +126,15 @@ $('#bt_saveDotti').on('click', function () {
             	$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
                 return;
             }
+			$('.eventDisplay').showAlert({message:  'Sauvegarde effectuée' ,level: 'success'});
             modifyWithoutSave=false;
 			loadMemoryList(id);
         }
     });
+                    }
+                },
+            }
+        });
 });
 
 $('#bt_loadDotti').on('click', function () {
@@ -122,6 +147,7 @@ $('#bt_loadDotti').on('click', function () {
 				memory: $('.memoryload').value()
 			},
 			dataType: 'json',
+			global: false,
 			error: function(request, status, error) {
 				handleAjaxError(request, status, error);
 			},
@@ -198,6 +224,7 @@ function sendPixelArray(_array,_id) {
 				array: _array,
 				id: _id
 			},
+			global: false,
 			dataType: 'json',
 			error: function(request, status, error) {
 				handleAjaxError(request, status, error);
@@ -220,6 +247,7 @@ function loadMemoryList(_id) {
 				action: "loadMemoryList",
 				id: _id
 			},
+			global:false,
 			dataType: 'json',
 			error: function(request, status, error) {
 				handleAjaxError(request, status, error);
