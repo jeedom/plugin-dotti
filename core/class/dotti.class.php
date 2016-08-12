@@ -192,6 +192,82 @@ class dotti extends eqLogic {
 		$return .= '<table>';
 		return $return;
 	}
+	
+	public static function sendDataRealTime($_data, $_id) {
+		$dotti = dotti::byId($_id);
+		$data = array();
+		foreach($_data as $pixel=>$color){
+			$data[$pixel] = hex2rgb($color);
+		}
+		$dotti->generateJson($data, array(), true);
+		$cmd = 'sudo python ' . dirname(__FILE__) . '/../../resources/dottiset.py ' . $dotti->getConfiguration('mac');
+		$result = shell_exec($cmd);
+		for ($i = 0; $i < 4; $i++) {
+			if (trim($result) == 'OK') {
+				break;
+			}
+			sleep(1);
+			$result = shell_exec($cmd);
+		}
+		if (trim($result) != 'OK' && $dotti->getConfiguration('noErrorOnFailed', 0) == 0) {
+			throw new Exception('[Dotti] ' . $result);
+		}
+	}
+	
+	public static function loadDotti($_memory, $_id) {
+		$dotti = dotti::byId($_id);
+		$data['type'] = 'loadid';
+		$data['id'] = $_memory;
+		$dotti->sendData($data);
+		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
+		$dataColor = array();
+		if (file_exists($file)) {
+			$dataMemory = json_decode(file_get_contents($file),true);
+			if (isset($dataMemory[$_memory])){
+				$dataColor = $dataMemory[$_memory]['data'];
+			}
+		}
+		return $dataColor;
+	}
+	
+	public static function listMemory($_id) {
+		$dotti = dotti::byId($_id);
+		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
+		$dataMemory = array();
+		if (file_exists($file)) {
+			$dataMemory = json_decode(file_get_contents($file),true);
+		}
+		$list = '';
+		$i = 0;
+        while ($i < 256) {
+			$memoryName = $i . ': Mémoire vide';
+			if (isset($dataMemory[$i])){
+				$memoryName = $i . ' : ' .$dataMemory[$i]['name']; 
+			}
+			$list .= '<option value="' . $i . '">Mémoire ' . $memoryName . '</option>';
+			$i++;
+        }
+		return $list;
+	}
+	
+	public static function saveDotti($_memory, $_id, $_name, $_data) {
+		$dotti = dotti::byId($_id);
+		dotti::sendDataRealTime($_data,$_id);
+		$data['type'] = 'saveid';
+		$data['id'] = $_memory;
+		$dotti->sendData($data);
+		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
+		$dataMemory = array();
+		if (file_exists($file)) {
+			$dataMemory = json_decode(file_get_contents($file),true);
+		}
+		$dataMemory[$_memory]['name']= $_name;
+		$dataMemory[$_memory]['data']= $_data;
+		if (file_exists($file)) {
+			shell_exec('sudo rm ' . $file);
+		}
+		file_put_contents($file, json_encode($dataMemory, JSON_FORCE_OBJECT));
+	}
 
 	/*     * *********************Méthodes d'instance************************* */
 
@@ -245,7 +321,7 @@ class dotti extends eqLogic {
 		$cmd->setType('action');
 		$cmd->setSubType('message');
 		$cmd->setDisplay('title_disable', 1);
-		$cmd->setDisplay('message_placeholder', __('ID (0 à 255)', __FILE__));
+		$cmd->setDisplay('message_placeholder', __('ID (0 à 255) ou nom', __FILE__));
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
 
@@ -276,6 +352,22 @@ class dotti extends eqLogic {
 		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
 		$cmd->setDisplay('message_placeholder', __('Données brute en json', __FILE__));
 		$cmd->save();
+	}
+	
+	public function findIdWithName($_name) {
+		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $this->getConfiguration('mac')) . '.json';
+		$dataMemory = array();
+		$id = 0;
+		if (file_exists($file)) {
+			$dataMemory = json_decode(file_get_contents($file),true);
+		}
+		foreach ($dataMemory as $key=>$memory){
+			if ($memory['name'] == $_name){
+				$id = $key;
+				break;
+			}
+		}	
+		return $id;
 	}
 
 	public function sendData($_type, $_data) {
@@ -341,6 +433,11 @@ class dottiCmd extends cmd {
 			$eqLogic->sendData('display', dotti::number2line($_options['message'], $line));
 		}
 		if (in_array($this->getLogicalId(), array('loadid', 'saveid'))) {
+			if ($this->getLogicalId() == 'loadid'){
+				if (!is_numeric($_options['message'])){
+					$_options['message'] = $eqLogic->findIdWithName($_options['message']);
+				}
+			}
 			$eqLogic->sendData($this->getLogicalId(), $_options['message']);
 		}
 	}

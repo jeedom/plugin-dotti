@@ -23,8 +23,35 @@ try {
     if (!isConnect('admin')) {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
     }
-
-
+	
+	if (init('action') == 'loadDotti') {
+		$memory = init('memory');
+		$id = init('id');
+		ajax::success(dotti::loadDotti($memory,$id));
+	}
+	
+	if (init('action') == 'saveDotti') {
+		$memory = init('memory');
+		$id = init('id');
+		$name = init('name');
+		$data = init('data');
+		if ($name == ''){
+			ajax::error('Veuillez choisir un nom pour votre image');
+		} else {
+			ajax::success(dotti::saveDotti($memory,$id,$name,$data));
+		}
+	}
+	
+	if (init('action') == 'loadMemoryList') {
+		$id = init('id');
+		ajax::success(dotti::listMemory($id));
+	}
+	
+	if (init('action') == 'sendPixelArray') {
+		$array = init('array');
+		$id = init('id');
+		ajax::success(dotti::sendDataRealTime($array,$id));
+	}
 
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
