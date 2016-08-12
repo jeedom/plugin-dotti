@@ -101,7 +101,7 @@ def display(mac=None,data=None):
 		logging.error('[display] mac and data arg can not be null')
 		return
 	logging.debug('Write display into '+str(mac))
-	for pixel, value in data[0].iteritems():
+	for pixel, value in data.iteritems():
 		write(mac,struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(value[0]), int(value[1]), int(value[2])))
 		time.sleep(0.05)
 

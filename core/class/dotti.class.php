@@ -192,11 +192,11 @@ class dotti extends eqLogic {
 		$return .= '<table>';
 		return $return;
 	}
-	
+
 	public static function sendDataRealTime($_data, $_id) {
 		$dotti = dotti::byId($_id);
 		$data = array();
-		foreach($_data as $pixel=>$color){
+		foreach ($_data as $pixel => $color) {
 			$data[$pixel] = hex2rgb($color);
 		}
 		$dotti->generateJson($data, array(), true);
@@ -213,7 +213,7 @@ class dotti extends eqLogic {
 			throw new Exception('[Dotti] ' . $result);
 		}
 	}
-	
+
 	public static function loadDotti($_memory, $_id) {
 		$dotti = dotti::byId($_id);
 		$data['type'] = 'loadid';
@@ -222,47 +222,47 @@ class dotti extends eqLogic {
 		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
 		$dataColor = array();
 		if (file_exists($file)) {
-			$dataMemory = json_decode(file_get_contents($file),true);
-			if (isset($dataMemory[$_memory])){
+			$dataMemory = json_decode(file_get_contents($file), true);
+			if (isset($dataMemory[$_memory])) {
 				$dataColor = $dataMemory[$_memory]['data'];
 			}
 		}
 		return $dataColor;
 	}
-	
+
 	public static function listMemory($_id) {
 		$dotti = dotti::byId($_id);
 		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
 		$dataMemory = array();
 		if (file_exists($file)) {
-			$dataMemory = json_decode(file_get_contents($file),true);
+			$dataMemory = json_decode(file_get_contents($file), true);
 		}
 		$list = '';
 		$i = 0;
-        while ($i < 256) {
+		while ($i < 256) {
 			$memoryName = $i . ': Mémoire vide';
-			if (isset($dataMemory[$i])){
-				$memoryName = $i . ' : ' .$dataMemory[$i]['name']; 
+			if (isset($dataMemory[$i])) {
+				$memoryName = $i . ' : ' . $dataMemory[$i]['name'];
 			}
 			$list .= '<option value="' . $i . '">Mémoire ' . $memoryName . '</option>';
 			$i++;
-        }
+		}
 		return $list;
 	}
-	
+
 	public static function saveDotti($_memory, $_id, $_name, $_data) {
 		$dotti = dotti::byId($_id);
-		dotti::sendDataRealTime($_data,$_id);
+		dotti::sendDataRealTime($_data, $_id);
 		$data['type'] = 'saveid';
 		$data['id'] = $_memory;
 		$dotti->sendData($data);
 		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
 		$dataMemory = array();
 		if (file_exists($file)) {
-			$dataMemory = json_decode(file_get_contents($file),true);
+			$dataMemory = json_decode(file_get_contents($file), true);
 		}
-		$dataMemory[$_memory]['name']= $_name;
-		$dataMemory[$_memory]['data']= $_data;
+		$dataMemory[$_memory]['name'] = $_name;
+		$dataMemory[$_memory]['data'] = $_data;
 		if (file_exists($file)) {
 			shell_exec('sudo rm ' . $file);
 		}
@@ -353,25 +353,26 @@ class dotti extends eqLogic {
 		$cmd->setDisplay('message_placeholder', __('Données brute en json', __FILE__));
 		$cmd->save();
 	}
-	
+
 	public function findIdWithName($_name) {
 		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $this->getConfiguration('mac')) . '.json';
 		$dataMemory = array();
 		$id = 0;
 		if (file_exists($file)) {
-			$dataMemory = json_decode(file_get_contents($file),true);
+			$dataMemory = json_decode(file_get_contents($file), true);
 		}
-		foreach ($dataMemory as $key=>$memory){
-			if ($memory['name'] == $_name){
+		foreach ($dataMemory as $key => $memory) {
+			if ($memory['name'] == $_name) {
 				$id = $key;
 				break;
 			}
-		}	
+		}
 		return $id;
 	}
 
 	public function sendData($_type, $_data) {
-		if ($_type == 'diplay') {
+		if ($_type == 'display') {
+			echo 'je passe';
 			$data = array();
 			if (isset($_data[0]) && is_array($_data[0])) {
 				foreach ($_data as $x => $line) {
@@ -383,8 +384,7 @@ class dotti extends eqLogic {
 			}
 			$_data = $data;
 		}
-
-		$value = json_encode(array('apikey' => config::byKey('api'), 'type' => $_type, 'data' => $_data, 'mac' => $this->getConfiguration('mac')));
+		$value = json_encode(array('apikey' => config::byKey('api'), 'type' => $_type, 'data' => $_data, 'mac' => $this->getConfiguration('mac')), JSON_FORCE_OBJECT);
 		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
 		socket_connect($socket, '127.0.0.1', config::byKey('socketport', 'dotti'));
 		socket_write($socket, $value, strlen($value));
@@ -433,8 +433,8 @@ class dottiCmd extends cmd {
 			$eqLogic->sendData('display', dotti::number2line($_options['message'], $line));
 		}
 		if (in_array($this->getLogicalId(), array('loadid', 'saveid'))) {
-			if ($this->getLogicalId() == 'loadid'){
-				if (!is_numeric($_options['message'])){
+			if ($this->getLogicalId() == 'loadid') {
+				if (!is_numeric($_options['message'])) {
 					$_options['message'] = $eqLogic->findIdWithName($_options['message']);
 				}
 			}
