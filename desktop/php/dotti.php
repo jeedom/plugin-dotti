@@ -103,7 +103,7 @@ foreach (object::all() as $object) {
         <div class="form-group">
          <label class="col-sm-3 control-label">{{Dessiner}}</label>
          <div class="col-sm-4">
-          <a class="btn btn-warning" id="bt_dottiScreen"><i class="fa fa-refresh"></i> {{Dessiner}}</a>
+          <a class="btn btn-warning" id="bt_dottiScreen"><i class="fa fa-paint-brush"></i> {{Dessiner}}</a>
         </div>
       </div>
     </fieldset>
