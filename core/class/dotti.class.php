@@ -409,6 +409,7 @@ class dottiCmd extends cmd {
 				$options['color'] = 'FFFFFF';
 			}
 			$eqLogic->sendData('display', dotti::text2array($_options['message'], $options['color']));
+			return;
 		}
 		if ($this->getLogicalId() == 'blackscreen') {
 			$data = array();
@@ -416,6 +417,7 @@ class dottiCmd extends cmd {
 				$data[$i] = array(0, 0, 0);
 			}
 			$eqLogic->sendData('display', $data);
+			return;
 		}
 		if ($this->getLogicalId() == 'rownumber') {
 			if (!is_numeric($_options['message'])) {
@@ -431,6 +433,16 @@ class dottiCmd extends cmd {
 				}
 			}
 			$eqLogic->sendData('display', dotti::number2line($_options['message'], $line));
+			return;
+		}
+		if ($this->getLogicalId() == 'sendraw') {
+			$options = arg2array($_options['message']);
+			$data = array();
+			foreach ($options as $key => $value) {
+				$data[$key] = hex2rgb($value);
+			}
+			$eqLogic->sendData('display', $data);
+			return;
 		}
 		if (in_array($this->getLogicalId(), array('loadid', 'saveid'))) {
 			if ($this->getLogicalId() == 'loadid') {
@@ -439,6 +451,7 @@ class dottiCmd extends cmd {
 				}
 			}
 			$eqLogic->sendData($this->getLogicalId(), $_options['message']);
+			return;
 		}
 	}
 
