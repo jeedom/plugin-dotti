@@ -60,7 +60,7 @@ def connect(mac=None):
 			logging.error('Connection error on '+ str(mac) +' => '+str(err))
 			return
 	logging.debug("Connection successfull on " + str(mac))		
-	DOTTIS[mac]['characteristic'] = btle.Characteristic(DOTTIS[mac], btle.UUID('fff3'), 0x29, 8, 0x2A)
+	DOTTIS[mac]['characteristic'] = btle.Characteristic(DOTTIS[mac]['connection'], btle.UUID('fff3'), 0x29, 8, 0x2A)
 	return
 
 def disconnect(mac=None):
