@@ -79,10 +79,10 @@ def write(mac=None,message=None):
 		logging.error('[write] mac and message arg can not be null')
 		return
 	logging.debug('Write message into '+str(mac))
-	if not mac in DOTTIS or DOTTIS[mac]['connection'] is None:
+	if not mac in DOTTIS or not 'connection' in DOTTIS[mac] or DOTTIS[mac]['connection'] is None:
 		connect(mac)
 
-	if not mac in DOTTIS or DOTTIS[mac]['connection'] is None:
+	if not mac in DOTTIS or not 'connection' in DOTTIS[mac] or DOTTIS[mac]['connection'] is None:
 		raise Exception("Can not found or connect to "+str(mac))
 	try:
 		DOTTIS[mac]['characteristic'].write(message)
