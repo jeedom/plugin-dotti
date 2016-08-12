@@ -346,12 +346,12 @@ class dotti extends eqLogic {
 	public function findIdWithName($_name) {
 		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $this->getConfiguration('mac')) . '.json';
 		$dataMemory = array();
-		$id = 0;
+		$id = -1;
 		if (file_exists($file)) {
 			$dataMemory = json_decode(file_get_contents($file), true);
 		}
 		foreach ($dataMemory as $key => $memory) {
-			if ($memory['name'] == $_name) {
+			if (strtolower($memory['name']) == strtolower($_name)) {
 				$id = $key;
 				break;
 			}
@@ -436,7 +436,11 @@ class dottiCmd extends cmd {
 		if (in_array($this->getLogicalId(), array('loadid', 'saveid'))) {
 			if ($this->getLogicalId() == 'loadid') {
 				if (!is_numeric($_options['message'])) {
-					$_options['message'] = $eqLogic->findIdWithName($_options['message']);
+					if ($eqLogic->findIdWithName($_options['message']) != -1){
+						$_options['message'] = $eqLogic->findIdWithName($_options['message']);
+					} else {
+						throw new Exception(__('Ce nom d\'image n\'existe pas ', __FILE__) . $_options['message']);
+					}
 				}
 			}
 			$eqLogic->sendData($this->getLogicalId(), $_options['message']);

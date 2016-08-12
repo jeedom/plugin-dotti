@@ -35,10 +35,16 @@ try {
 		$id = init('id');
 		$name = init('name');
 		$data = init('data');
-		if ($name == ''){
-			ajax::error('Veuillez choisir un nom pour votre image');
+		$dotti = dotti::byId($id);
+		$exists = $dotti->findIdWithName($name);
+		if ($exists != -1 && $exists != $memory){
+			ajax::error('Le nom "' . $name . '" existe déjà sur la mémoire : ' . $exists);
 		} else {
-			ajax::success(dotti::saveDotti($memory,$id,$name,$data));
+			if ($name == ''){
+				ajax::error('Veuillez choisir un nom pour votre image');
+			} else {
+				ajax::success(dotti::saveDotti($memory,$id,$name,$data));
+			}
 		}
 	}
 	
