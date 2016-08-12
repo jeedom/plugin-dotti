@@ -47,6 +47,7 @@ def connect(mac=None):
 
 	if mac not in DOTTIS:
 		DOTTIS[mac] = {}
+		DOTTIS[mac]['connection'] = None
 		
 	try:
 		logging.debug("(1) Try connect to " + str(mac))
@@ -65,7 +66,7 @@ def connect(mac=None):
 
 def disconnect(mac=None):
 	logging.debug("Disconnect from : " + str(mac))
-	if mac in DOTTIS and 'connection' in DOTTIS[mac] and not DOTTIS[mac]['connection'] is None : 
+	if mac in DOTTIS and not DOTTIS[mac]['connection'] is None : 
 		try:
 			DOTTIS[mac]['connection'].disconnect()
 			DOTTIS[mac]['connection'] = None
@@ -79,11 +80,13 @@ def write(mac=None,message=None):
 		logging.error('[write] mac and message arg can not be null')
 		return
 	logging.debug('Write message into '+str(mac))
-	if not mac in DOTTIS or not 'connection' in DOTTIS[mac] or DOTTIS[mac]['connection'] is None:
+	if not mac in DOTTIS or DOTTIS[mac]['connection'] is None:
 		connect(mac)
 
-	if not mac in DOTTIS or not 'connection' in DOTTIS[mac] or DOTTIS[mac]['connection'] is None:
+	if not mac in DOTTIS or DOTTIS[mac]['connection'] is None:
 		raise Exception("Can not found or connect to "+str(mac))
+		return
+
 	try:
 		DOTTIS[mac]['characteristic'].write(message)
 	except Exception as err:
