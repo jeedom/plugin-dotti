@@ -43,7 +43,7 @@ def read_socket():
 			logging.error("Invalid apikey from socket : " + str(message))
 			return
 		try:
-			
+			print 'read'
 		except Exception, e:
 			logging.error('Send command to dotti error : '+str(e))
 
@@ -106,7 +106,6 @@ for arg in sys.argv:
 		temp, _device = arg.split("=")
 		
 _socket_port = int(_socket_port)
-_cycle = float(_cycle)
 
 jeedom_utils.set_log_level(_log_level)
 
