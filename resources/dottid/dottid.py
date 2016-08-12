@@ -65,7 +65,7 @@ def connect(mac=None):
 
 def disconnect(mac=None):
 	logging.debug("Disconnect from : " + str(mac))
-	if mac in DOTTIS and not DOTTIS[mac]['connection'] is None : 
+	if mac in DOTTIS and 'connection' in DOTTIS[mac] and not DOTTIS[mac]['connection'] is None : 
 		try:
 			DOTTIS[mac]['connection'].disconnect()
 			DOTTIS[mac]['connection'] = None
