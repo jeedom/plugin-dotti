@@ -43,7 +43,7 @@ def connect(mac=None):
 	logging.debug("Get bluettoth connection for : " + str(mac))
 	if mac in DOTTIS and not DOTTIS[mac]['connection'] is None : 
 		logging.debug("Found it in cache")
-		return DOTTIS[mac]['connection']
+		return
 
 	if mac in DOTTIS:
 		DOTTIS[mac] = {}
@@ -59,10 +59,12 @@ def connect(mac=None):
 				DOTTIS[mac]['connection'] = btle.Peripheral(mac, btle.ADDR_TYPE_PUBLIC)
 			except Exception as err:
 				logging.error('Connection error on '+ str(mac) +' => '+str(err))
-				return None
+				return
 		logging.debug("Connection successfull on " + str(mac))		
 		DOTTIS[mac]['characteristic'] = btle.Characteristic(DOTTIS[mac], btle.UUID('fff3'), 0x29, 8, 0x2A)
-		return DOTTIS[mac]['connection']
+		DOTTIS[mac]['inUsed'] = False
+		return
+
 	logging.error('Device not allow : '+str(mac))
 	return None
 
@@ -76,6 +78,67 @@ def disconnect(mac=None):
 		except Exception as err:
 			logging.error('Disconnection error on '+ str(mac)+' => '+str(err))
 
+def write(mac=None,message=None):
+	global DOTTIS
+	if mac is None or message is None:
+		logging.error('[write] mac and message arg can not be null')
+		return
+
+	if not mac in DOTTIS or DOTTIS[mac]['connection'] is None:
+		connect(mac)
+
+	if not mac in DOTTIS or DOTTIS[mac]['connection'] is None:
+		logging.error("Can not found or connect to "+str(mac))
+		return
+
+	DOTTIS[mac]['inUsed'] = True;
+
+	try:
+		DOTTIS[mac]['characteristic'].write(message)
+	except Exception as err:
+		time.sleep(0.05)
+		try:
+			DOTTIS[mac]['characteristic'].write(message)
+		except Exception as err:
+			DOTTIS[mac]['inUsed'] = False;
+			disconnect(mac)
+			logging.error('Write error on '+ str(mac)+' => '+str(err))
+
+	DOTTIS[mac]['inUsed'] = False;
+
+# ----------------------------------------------------------------------------
+
+def doJsonOnDotti(mac=None,jsonfile=None):
+	if mac is None or jsonfile is None:
+		logging.error('[doJsonOnDotti] mac and jsonfile arg can not be null')
+		return
+	logging.debug('Write json '+str(jsonfile)+' into '+str(mac))
+	if not os.path.exists(jsonfile):
+		logging.error("Json file not found : "+jsonfile)
+		return
+
+	with open(jsonfile) as data_file:    
+		display = json.load(data_file)
+
+	for pixel in display['data']:
+		write(mac,struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(display['data'][pixel]['0']), int(display['data'][pixel]['1']), int(display['data'][pixel]['2'])))
+		time.sleep(0.05)
+
+def loadid(mac=None,loadid=None):
+	if mac is None or loadid is None:
+		logging.error('[loadid] mac and loadid arg can not be null')
+		return
+	logging.debug('Load id '+str(saveid)+' into '+str(mac))
+	write(mac,struct.pack('<BBBBBB', 0x06, 0x08, 0x02,int(loadid),0x00,0x00))
+
+def saveid(mac=None,saveid=None):
+	global DOTTIS
+	if mac is None or loadid is None:
+		logging.error('[saveid] mac and saveid arg can not be null')
+		return
+	logging.debug('Save id '+str(saveid)+' into '+str(mac))
+	write(mac,struct.pack('<BBBBBB', 0x06, 0x07, 0x02,int(saveid),0x00,0x00))
+
 # ----------------------------------------------------------------------------
 
 def read_socket():
@@ -86,8 +149,16 @@ def read_socket():
 		if message['apikey'] != _apikey:
 			logging.error("Invalid apikey from socket : " + str(message))
 			return
+		if 'mac' in message:
+			logging.error("No mac address : " + str(message))
+			return
 		try:
-			print 'read'
+			if 'jsonfile' in message:
+				doJsonOnDotti(message['mac'],message['jsonfile'])
+			if 'loadid' in message:
+				loadid(message['mac'],message['loadid'])
+			if 'saveid' in message:
+				saveid(message['mac'],message['saveid'])
 		except Exception, e:
 			logging.error('Send command to dotti error : '+str(e))
 
