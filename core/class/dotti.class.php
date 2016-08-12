@@ -374,6 +374,7 @@ class dotti extends eqLogic {
 		if ($_type == 'display') {
 			if (isset($_data[0]) && is_array($_data[0])) {
 				$data = array();
+				$i = 1;
 				foreach ($_data as $x => $line) {
 					foreach ($line as $y => $color) {
 						$data[$i] = $color;
