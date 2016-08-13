@@ -300,9 +300,10 @@ class dotti extends eqLogic {
 	}
 
 	/*     * *********************Méthodes d'instance************************* */
-
+	public function preSave() {
+		$this->setCategory('multimedia',1);
+	}
 	public function postSave() {
-		$this->setCategory('multimedia');
 		$cmd = $this->getCmd(null, 'sendtext');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();
