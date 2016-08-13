@@ -133,7 +133,7 @@ $('#bt_loadImage').on('click', function () {
 			data: {
 				action: "loadImage",
 				id: id,
-				name: $('.memoryload').find('option:selected').text()
+				name: $('.memoryload').val()
 			},
 			dataType: 'json',
 			global: false,
