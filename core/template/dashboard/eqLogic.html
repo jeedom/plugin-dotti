@@ -16,11 +16,11 @@
 	<span class="cmd cmd-widget" data-cmd_id="#cmd_loadimage_id#" style="display:none;"></span>
 	<span class="cmd cmd-widget" data-cmd_id="#cmd_sendtext_id#" style="display:none;"></span>
       <center>
-        <a class="btn btn-default btn-circle btn-xs cmd blackscreen" data-cmd_id="#cmd_blackscreen_id#" title="Eteindre"><i class="fa fa-power-off"></i></a>
-		<a class="btn btn-default btn-circle btn-xs sendtext" id="bt_sendtext#uid#" title="Envoyer Texte"><i class="fa fa-share-square-o"></i></a>
-		<a class="btn btn-default btn-circle btn-xs picture" id="bt_dottiScreen#uid#" title="Dessiner"><i class="fa fa-paint-brush"></i></a></br>
-      <input class="name form-control" id="texte" type='text' style="margin-top:5px;width:30%"/>
-	   <div class="listImage"><select class="memoryload form-control" style="margin-top:5px;width:50%">
+        <a class="btn btn-default btn-circle btn-xs cmd blackscreen#uid#" data-cmd_id="#cmd_blackscreen_id#" title="Eteindre"><i class="fa fa-power-off"></i></a>
+		<a class="btn btn-default btn-circle btn-xs sendtext#uid#" id="bt_sendtext#uid#" title="Envoyer Texte"><i class="fa fa-share-square-o"></i></a>
+		<a class="btn btn-default btn-circle btn-xs picture#uid#" id="bt_dottiScreen#uid#" title="Dessiner"><i class="fa fa-paint-brush"></i></a></br>
+      <input class="name#uid# form-control" id="texte" type='text' style="margin-top:5px;width:30%"/>
+	   <div class="listImage#uid#"><select class="memoryload#uid# form-control" style="margin-top:5px;width:50%">
 		</select></div>
      </center>
     </div>
@@ -33,14 +33,14 @@
 			for(var i in loadimage#id#){
 				loadloadimage#id# += '<option value="' + loadimage#id#[i] + '">' + loadimage#id#[i].charAt(0).toUpperCase() + loadimage#id#[i].slice(1) + '</option>';
 			}
-			$(".dotti[data-eqLogic_uid=#uid#] .memoryload").append(loadloadimage#id#);
+			$(".dotti[data-eqLogic_uid=#uid#] .memoryload#uid#").append(loadloadimage#id#);
 		}
-	$('.dotti[data-eqLogic_uid=#uid#] .memoryload').on('change',function(){
+	$('.dotti[data-eqLogic_uid=#uid#] .memoryload#uid#').on('change',function(){
 		jeedom.cmd.execute({id: '#cmd_loadimage_id#', value: {'message': $(this).value()}});
 	});
 	$('#bt_sendtext#uid#').on('click',function(){
-		console.log($('.name').val());
-		jeedom.cmd.execute({id: '#cmd_sendtext_id#', value: {'message': $('.name').val()}});
+		console.log($('.name#uid#').val());
+		jeedom.cmd.execute({id: '#cmd_sendtext_id#', value: {'message': $('.name#uid#').val()}});
 	});
 	$('#bt_dottiScreen#uid#').on('click', function () {
 	id = #id#;
