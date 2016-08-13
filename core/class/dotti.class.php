@@ -286,6 +286,16 @@ class dotti extends eqLogic {
 		if (file_exists($file)) {
 			shell_exec('sudo rm ' . $file);
 		}
+		$array = array();
+		foreach ($dataMemory as $name=>$data){
+			$array[] = $name;
+		}
+		log::add('dotti','debug', print_r($array,true));
+		foreach (dotti::byType('dotti') as $dotti) {
+			$cmd = $dotti->getCmd('action', 'loadimage');
+			$cmd->setDisplay('title_possibility_list', json_encode($array));
+			$cmd->save();
+		}
 		file_put_contents($file, json_encode($dataMemory, JSON_FORCE_OBJECT));
 	}
 
@@ -340,8 +350,9 @@ class dotti extends eqLogic {
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('message');
-		$cmd->setDisplay('title_disable', 1);
-		$cmd->setDisplay('message_placeholder', __('Nom', __FILE__));
+		$cmd->setDisplay('message_disable', 1);
+		$cmd->setDisplay('title_disable', 0);
+		$cmd->setDisplay('title_placeholder', __('Nom', __FILE__));
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
 
