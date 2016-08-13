@@ -302,7 +302,7 @@ class dotti extends eqLogic {
 	/*     * *********************Méthodes d'instance************************* */
 
 	public function postSave() {
-		$this->setCategory('multimedia', 1);
+		$this->setCategory('multimedia');
 		$cmd = $this->getCmd(null, 'sendtext');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();
@@ -412,8 +412,6 @@ class dotti extends eqLogic {
 				$replace['#loadimage#'] = str_replace(array("'", '+'), array("\'", '\+'), $cmd->getDisplay('title_possibility_list'));
 			}
 		}
-		$batterylevel = $this->getCache('batteryStatus');
-		$replace['#battery_level#'] = $batterylevel;
 		$html = template_replace($replace, getTemplate('core', $version, 'eqLogic', 'dotti'));
 		cache::set('widgetHtml' . $version . $this->getId(), $html, 0);
 		return $html;
