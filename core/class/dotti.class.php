@@ -265,7 +265,6 @@ class dotti extends eqLogic {
 				break;
 			}
 		}
-		log::add('dotti','debug',$dataColor);
 		return $dataColor;
 	}
 
@@ -390,6 +389,32 @@ class dotti extends eqLogic {
 		socket_connect($socket, '127.0.0.1', config::byKey('socketport', 'dotti'));
 		socket_write($socket, $value, strlen($value));
 		socket_close($socket);
+	}
+	
+	public function toHtml($_version = 'dashboard') {
+		$replace = $this->preToHtml($_version);
+		if (!is_array($replace)) {
+			return $replace;
+		}
+		$version = jeedom::versionAlias($_version);
+		foreach ($this->getCmd('info') as $cmd) {
+			$replace['#' . $cmd->getLogicalId() . '#'] = $cmd->execCmd();
+			$replace['#' . $cmd->getLogicalId() . '_id#'] = $cmd->getId();
+			if ($cmd->getIsHistorized() == 1) {
+				$replace['#' . $cmd->getLogicalId() . '_history#'] = 'history cursor';
+			}
+		}
+		foreach ($this->getCmd('action') as $cmd) {
+			$replace['#cmd_' . $cmd->getLogicalId() . '_id#'] = $cmd->getId();
+			if ($cmd->getLogicalId() == 'loadimage') {
+				$replace['#loadimage#'] = str_replace(array("'", '+'), array("\'", '\+'), $cmd->getDisplay('title_possibility_list'));
+			}
+		}
+		$batterylevel = $this->getCache('batteryStatus');
+		$replace['#battery_level#'] = $batterylevel;
+		$html = template_replace($replace, getTemplate('core', $version, 'eqLogic', 'dotti'));
+		cache::set('widgetHtml' . $version . $this->getId(), $html, 0);
+		return $html;
 	}
 
 	/*     * **********************Getteur Setteur*************************** */
