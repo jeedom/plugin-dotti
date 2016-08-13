@@ -113,6 +113,13 @@ def display(mac=None,data=None):
 		write(mac,struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(value['0']), int(value['1']), int(value['2'])))
 		time.sleep(0.05)
 
+def color(mac=None,data=None):
+	if mac is None or data is None:
+		logging.error('[color] mac and data arg can not be null')
+		return
+	logging.debug('Write color into '+str(mac))
+	write(mac,struct.pack('<BBBBBB', 0x06, 0x01, int(data['0']), int(data['1']), int(data['2']), 0x00))
+
 def loadid(mac=None,loadid=None):
 	if mac is None or loadid is None:
 		logging.error('[loadid] mac and loadid arg can not be null')
@@ -154,6 +161,8 @@ def read_socket():
 				loadid(message['mac'],message['data'])
 			if message['type'] == 'saveid':
 				saveid(message['mac'],message['data'])
+			if message['type'] == 'color':
+				color(message['mac'],message['data'])
 		except Exception, e:
 			logging.error('Send command to dotti error : '+str(e))
 

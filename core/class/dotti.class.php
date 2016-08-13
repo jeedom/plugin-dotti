@@ -316,6 +316,18 @@ class dotti extends eqLogic {
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
 		$cmd->save();
+		
+		$cmd = $this->getCmd(null, 'sendcolor');
+		if (!is_object($cmd)) {
+			$cmd = new dottiCmd();
+			$cmd->setLogicalId('sendcolor');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Couleur', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('color');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
 
 		$cmd = $this->getCmd(null, 'blackscreen');
 		if (!is_object($cmd)) {
@@ -473,6 +485,10 @@ class dottiCmd extends cmd {
 		}
 		if ($this->getLogicalId() == 'loadimage'){
 			$eqLogic->sendData('display', dotti::getImageData($_options['message']));
+			return;
+		}
+		if ($this->getLogicalId() == 'sendcolor'){
+			$eqLogic->sendData('color', hex2rgb($_options['color']));
 			return;
 		}
 	}
