@@ -451,11 +451,7 @@ class dottiCmd extends cmd {
 			return;
 		}
 		if ($this->getLogicalId() == 'blackscreen') {
-			$data = array();
-			for ($i = 1; $i < 65; $i++) {
-				$data[$i] = array(0, 0, 0);
-			}
-			$eqLogic->sendData('display', $data);
+			$eqLogic->sendData('color', hex2rgb('#000000'));
 			return;
 		}
 		if ($this->getLogicalId() == 'rownumber') {
