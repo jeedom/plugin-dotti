@@ -23,7 +23,8 @@ class dotti extends eqLogic {
 	/*     * *************************Attributs****************************** */
 
 	/*     * ***********************Methode static*************************** */
-
+	public static $_widgetPossibility = array('custom' => true);
+	
 	public static function dependancy_info() {
 		$return = array();
 		$return['log'] = 'dotti_update';
@@ -301,6 +302,7 @@ class dotti extends eqLogic {
 	/*     * *********************Méthodes d'instance************************* */
 
 	public function postSave() {
+		$this->setCategory('multimedia', 1);
 		$cmd = $this->getCmd(null, 'sendtext');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();

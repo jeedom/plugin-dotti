@@ -175,7 +175,7 @@ $('#bt_delImage').on('click', function () {
 			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
 			data: {
 				action: "delImage",
-				name: $('.memoryload').find('option:selected').text()
+				name: $('.memoryload').val()
 			},
 			global : false,
 			dataType: 'json',
