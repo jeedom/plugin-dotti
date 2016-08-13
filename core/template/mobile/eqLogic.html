@@ -6,7 +6,9 @@
     <div class="col-xs-12">
 	<span class="cmd cmd-widget" data-cmd_id="#cmd_loadimage_id#" style="display:none;"></span>
 	<span class="cmd cmd-widget" data-cmd_id="#cmd_sendtext_id#" style="display:none;"></span>
+	<span class="cmd cmd-widget" data-cmd_id="#cmd_sendcolor_id#" style="display:none;"></span>
       <center>
+        <label class="fa fa-circle pixelCircle#uid#" style="color : #000000;font-size:2em; cursor: pointer;"><div style="width:0;height:0;visibility:hidden"><input class="pixelcolor#uid#" type="color" value="#000000" style="width:0;height:0;visibility:hidden"></div></label>
         <a class="ui-btn ui-mini ui-btn-inline ui-btn-b cmd blackscreen#uid#" data-cmd_id="#cmd_blackscreen_id#"><i class="fa fa-power-off"></i></a>
 		<a class="ui-btn ui-mini ui-btn-inline ui-btn-b sendtext#uid#" id="bt_sendtext#uid#"><i class="fa fa-share-square-o"></i></a>
       <div style="width:30%"><input class="name#uid# form-control" id="texte" type='text' style="margin-top:5px;"/></div>
@@ -36,5 +38,9 @@
    $('.eqLogic[data-eqLogic_uid=#uid#] .cmd').on('click', function() {
      jeedom.cmd.execute({id: $(this).data('cmd_id')});
    });
+   $('.pixelcolor#uid#').on('change', function() {
+	$(this).closest('.pixelCircle#uid#').css('color', $(this).val());
+	jeedom.cmd.execute({id: '#cmd_sendcolor_id#', value: {color : $(this).val()}});
+});
  </script>
 </div>
