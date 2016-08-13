@@ -56,6 +56,11 @@ class dotti extends eqLogic {
 			}
 		}
 		$return['launchable'] = 'ok';
+		$port = jeedom::getBluetoothMapping(config::byKey('port', 'dotti'));
+		if ($port == '') {
+			$return['launchable'] = 'nok';
+			$return['launchable_message'] = __('Le port n\'est pas configuré', __FILE__);
+		}
 		return $return;
 	}
 
@@ -65,11 +70,13 @@ class dotti extends eqLogic {
 		if ($deamon_info['launchable'] != 'ok') {
 			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
 		}
+		$port = jeedom::getBluetoothMapping(config::byKey('port', 'dotti'));
+
 		$dotti_path = realpath(dirname(__FILE__) . '/../../resources/dottid');
 		$cmd = '/usr/bin/python ' . $dotti_path . '/dottid.py';
+		$cmd .= ' --device=' . str_replace('hci', '', $port);
 		$cmd .= ' --loglevel=' . log::convertLogLevel(log::getLogLevel('dotti'));
 		$cmd .= ' --socketport=' . config::byKey('socketport', 'dotti');
-
 		$macs = '';
 		foreach (self::byType('dotti') as $dotti) {
 			if ($dotti->getConfiguration('mac') == '') {
@@ -240,8 +247,8 @@ class dotti extends eqLogic {
 		$dotti = dotti::byId($_id);
 		dotti::sendDataRealTime($_data, $_id);
 		sleep(5);
-		$dotti->sendData('saveid',$_memory);
-		$directory= dirname(__FILE__) . '/../../data/';
+		$dotti->sendData('saveid', $_memory);
+		$directory = dirname(__FILE__) . '/../../data/';
 		if (!is_dir($directory)) {
 			mkdir($directory);
 		}
@@ -436,7 +443,7 @@ class dottiCmd extends cmd {
 		if (in_array($this->getLogicalId(), array('loadid', 'saveid'))) {
 			if ($this->getLogicalId() == 'loadid') {
 				if (!is_numeric($_options['message'])) {
-					if ($eqLogic->findIdWithName($_options['message']) != -1){
+					if ($eqLogic->findIdWithName($_options['message']) != -1) {
 						$_options['message'] = $eqLogic->findIdWithName($_options['message']);
 					} else {
 						throw new Exception(__('Ce nom d\'image n\'existe pas ', __FILE__) . $_options['message']);

@@ -39,6 +39,7 @@ except ImportError:
 DOTTIS = {}
 
 def connect(mac=None):
+	maxRetry = 3
 	global DOTTIS
 	logging.debug("Get bluettoth connection for : " + str(mac))
 	if mac in DOTTIS and not DOTTIS[mac]['connection'] is None : 
@@ -49,17 +50,19 @@ def connect(mac=None):
 		DOTTIS[mac] = {}
 		DOTTIS[mac]['connection'] = None
 		
-	try:
-		logging.debug("(1) Try connect to " + str(mac))
-		DOTTIS[mac]['connection'] = btle.Peripheral(mac)
-	except Exception as err:
-		time.sleep(1)
+	i=0
+	while True:
+		i = i + 1
 		try:
-			logging.debug("(2) Try connect to " + str(mac))
-			DOTTIS[mac]['connection'] = btle.Peripheral(mac)
+			logging.debug("("+str(i)+") Try connect to " + str(mac))
+			DOTTIS[mac]['connection'] = btle.Peripheral(mac,iface=_device)
+			break
 		except Exception as err:
-			logging.error('Connection error on '+ str(mac) +' => '+str(err))
-			return
+			if i > maxRetry :
+				logging.error('Connection error on '+ str(mac) +' => '+str(err))
+				return
+			time.sleep(1)
+
 	logging.debug("Connection successfull on " + str(mac))		
 	DOTTIS[mac]['characteristic'] = btle.Characteristic(DOTTIS[mac]['connection'], btle.UUID('fff3'), 0x29, 8, 0x2A)
 	return
@@ -201,6 +204,7 @@ _device = 'auto'
 _pidfile = '/tmp/dottid.pid'
 _apikey = ''
 _macs = ''
+_device = 0
 
 for arg in sys.argv:
 	if arg.startswith("--loglevel="):
@@ -226,7 +230,7 @@ logging.info('Socket port : '+str(_socket_port))
 logging.info('Socket host : '+str(_socket_host))
 logging.info('PID file : '+str(_pidfile))
 logging.info('Apikey : '+str(_apikey))
-logging.info('Device : '+str(_device))
+logging.info('Device : hci'+str(_device))
 logging.info('Macs : '+str(_macs))
 
 if not os.path.isfile(btle.helperExe):
