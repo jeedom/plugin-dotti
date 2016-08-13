@@ -245,7 +245,7 @@ class dotti extends eqLogic {
 		}
 		$list = '';
 		foreach ($dataMemory as $name=>$data){
-			$list .= '<option value="' . strtolower($name) . '">' . $name . '</option>';
+			$list .= '<option value="' . strtolower($name) . '">' . ucfirst($name) . '</option>';
 		}
 		return $list;
 	}
@@ -282,7 +282,7 @@ class dotti extends eqLogic {
 		if (file_exists($file)) {
 			$dataMemory = json_decode(file_get_contents($file), true);
 		}
-		$dataMemory[$_name] = $_data;
+		$dataMemory[strtolower($_name)] = $_data;
 		if (file_exists($file)) {
 			shell_exec('sudo rm ' . $file);
 		}
