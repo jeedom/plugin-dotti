@@ -56,39 +56,24 @@ sendVarToJS('id', init('id'));
 <center>
  <div class="col-lg-2">
  <div class="form-group">
-<a class="btn btn-warning" id="bt_sendAll"><i class="fa fa-refresh"></i> {{Afficher sur le Dotti}}</a></br>
+<a class="btn btn-warning" id="bt_sendAll"><i class="fa fa-paint-brush"></i> {{Afficher sur le Dotti}}</a></br>
 </div>
 <div class="form-group">
 	<label class="control-label">{{Nom de l'image}}</label>
    <input class="name form-control" id="texte" type='text'/>
-   <select class="memorysave form-control" style="margin-top:5px">
-   <?php
-        $i = 0;
-        while ($i < 256) {
-          echo '<option value="' . $i . '">{{Mémoire ' . $i . '}}</option>';
-          $i++;
-        }
-	?>
-		</select>
-		<a class="btn btn-success" id="bt_saveDotti"><i class="fa fa-refresh"></i> {{Sauver l'image}}</a>
+	<a class="btn btn-success" id="bt_saveImage"><i class="fa fa-floppy-o"></i> {{Sauver l'image}}</a>
 </div>
 <div class="form-group">
 <select class="memoryload form-control" style="margin-top:5px">
-   <?php
-        $i = 0;
-        while ($i < 256) {
-          echo '<option value="' . $i . '">{{Mémoire ' . $i . '}}</option>';
-          $i++;
-        }
-	?>
 </select>
-<a class="btn btn-danger" id="bt_loadDotti"><i class="fa fa-refresh"></i> {{Charger une image}}</a>
+<a class="btn btn-warning" id="bt_loadImage"><i class="fa fa-download"></i> {{Charger une image}}</a>
+<a class="btn btn-danger" id="bt_delImage"><i class="fa fa-trash-o"></i></a>
 </div>
 </div>
 </center>
 <script>
 loadMemoryList(id);
-$('#bt_saveDotti').on('click', function () {
+$('#bt_saveImage').on('click', function () {
 	var array = {};
 	 $('.pixel').each(function( index ) {
 		 array[$(this).attr('data-pixel')] = hexc($(this).css('color'));
@@ -99,7 +84,7 @@ $('#bt_saveDotti').on('click', function () {
 	}
 	bootbox.dialog({
             title: 'Etes-vous sur ?',
-            message: 'Vous allez sauver l\'image dans la mémoire "' + $('.memorysave').find('option:selected').text() + '" avec le nom : ' +$('.name').val() +' ! Voulez-vous continuer ?',
+            message: 'Vous allez sauver l\'image avec le nom "' +$('.name').val() +'" ! Voulez-vous continuer ?',
             buttons: {
                 "{{Annuler}}": {
                     className: "btn-danger",
@@ -110,15 +95,14 @@ $('#bt_saveDotti').on('click', function () {
                     label: "{{Continuer}}",
                     className: "btn-success",
                     callback: function () {
-						$('.eventDisplay').showAlert({message:  'Sauvegarde en cours ...',level: 'warning'});
+						$('.eventDisplay').showAlert({message:  'Affichage sur le Dotti en cours ...',level: 'warning'});
                         $.ajax({// fonction permettant de faire de l'ajax
 			type: "POST", // methode de transmission des données au fichier php
 			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
 			data: {
-				action: "saveDotti",
+				action: "saveImage",
 				id: id,
 				name: $('.name').val(),
-				memory: $('.memorysave').value(),
 				data : array
 			},
 			global : false,
@@ -142,14 +126,14 @@ $('#bt_saveDotti').on('click', function () {
         });
 });
 
-$('#bt_loadDotti').on('click', function () {
+$('#bt_loadImage').on('click', function () {
 	$.ajax({// fonction permettant de faire de l'ajax
 			type: "POST", // methode de transmission des données au fichier php
 			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
 			data: {
-				action: "loadDotti",
+				action: "loadImage",
 				id: id,
-				memory: $('.memoryload').value()
+				name: $('.memoryload').find('option:selected').text()
 			},
 			dataType: 'json',
 			global: false,
@@ -161,15 +145,57 @@ $('#bt_loadDotti').on('click', function () {
             	$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
                 return;
             }
-			console.log(data.result);
 			if (!$.isEmptyObject(data.result)){
 				for(var pixelId in data.result){
 					$('[data-pixel="'+ pixelId.toString() +'"]').css('color', data.result[pixelId]);
 				}
 			}
+			$('.name').val($('.memoryload').find('option:selected').text());
             modifyWithoutSave=false;
         }
     });
+});
+
+$('#bt_delImage').on('click', function () {
+	bootbox.dialog({
+            title: 'Etes-vous sur ?',
+            message: 'Vous allez supprimer l\'image avec le nom "' +$('.memoryload').find('option:selected').text() +'" ! Voulez-vous continuer ?',
+            buttons: {
+                "{{Annuler}}": {
+                    className: "btn-danger",
+                    callback: function () {
+                    }
+                },
+                success: {
+                    label: "{{Continuer}}",
+                    className: "btn-success",
+                    callback: function () {
+                        $.ajax({// fonction permettant de faire de l'ajax
+			type: "POST", // methode de transmission des données au fichier php
+			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
+			data: {
+				action: "delImage",
+				name: $('.memoryload').find('option:selected').text()
+			},
+			global : false,
+			dataType: 'json',
+			error: function(request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+        success: function(data) { // si l'appel a bien fonctionné
+            if (data.state != 'ok') {
+            	$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
+                return;
+            }
+			$('.eventDisplay').showAlert({message:  'Suppression effectuée' ,level: 'success'});
+			loadMemoryList(id);
+            modifyWithoutSave=false;
+        }
+    });
+                    }
+                },
+            }
+        });
 });
 
  $('.pixel').on('click', function() {
@@ -249,8 +275,7 @@ function loadMemoryList(_id) {
 			type: "POST", // methode de transmission des données au fichier php
 			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
 			data: {
-				action: "loadMemoryList",
-				id: _id
+				action: "loadMemoryList"
 			},
 			global:false,
 			dataType: 'json',
@@ -263,8 +288,11 @@ function loadMemoryList(_id) {
                 return;
             }
             modifyWithoutSave=false;
-			$('.memorysave').empty().append(data.result);
-			$('.memoryload').empty().append(data.result);
+			if (data.result){
+				$('.memoryload').empty().append(data.result);
+			} else {
+				$('.memoryload').empty();
+			}
         }
     });
 }

@@ -24,33 +24,31 @@ try {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
     }
 	
-	if (init('action') == 'loadDotti') {
-		$memory = init('memory');
+	if (init('action') == 'loadImage') {
+		$name = init('name');
 		$id = init('id');
-		ajax::success(dotti::loadDotti($memory,$id));
+		ajax::success(dotti::loadImage($name,$id));
 	}
 	
-	if (init('action') == 'saveDotti') {
-		$memory = init('memory');
+	if (init('action') == 'saveImage') {
 		$id = init('id');
 		$name = init('name');
 		$data = init('data');
 		$dotti = dotti::byId($id);
-		$exists = $dotti->findIdWithName($name);
-		if ($exists != -1 && $exists != $memory){
-			ajax::error('Le nom "' . $name . '" existe déjà sur la mémoire : ' . $exists);
+		if ($name == ''){
+			ajax::error('Veuillez choisir un nom pour votre image');
 		} else {
-			if ($name == ''){
-				ajax::error('Veuillez choisir un nom pour votre image');
-			} else {
-				ajax::success(dotti::saveDotti($memory,$id,$name,$data));
-			}
+			ajax::success(dotti::saveImage($id,$name,$data));
 		}
 	}
 	
+	if (init('action') == 'delImage') {
+		$name = init('name');
+		ajax::success(dotti::delImage($name));
+	}
+	
 	if (init('action') == 'loadMemoryList') {
-		$id = init('id');
-		ajax::success(dotti::listMemory($id));
+		ajax::success(dotti::listMemory());
 	}
 	
 	if (init('action') == 'sendPixelArray') {

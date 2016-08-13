@@ -209,56 +209,80 @@ class dotti extends eqLogic {
 		$dotti->sendData('display', $data);
 	}
 
-	public static function loadDotti($_memory, $_id) {
+	public static function loadImage($_name, $_id) {
 		$dotti = dotti::byId($_id);
-		$dotti->sendData('loadid', $_memory);
-		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
+		$file = dirname(__FILE__) . '/../../data/collection.json';
 		$dataColor = array();
 		if (file_exists($file)) {
 			$dataMemory = json_decode(file_get_contents($file), true);
-			if (isset($dataMemory[$_memory])) {
-				$dataColor = $dataMemory[$_memory]['data'];
+			if (isset($dataMemory[$_name])) {
+				$dataColor = $dataMemory[$_name];
 			}
 		}
 		return $dataColor;
 	}
+	
+	public static function delImage($_name) {
+		$file = dirname(__FILE__) . '/../../data/collection.json';
+		if (file_exists($file)) {
+			$dataMemory = json_decode(file_get_contents($file), true);
+			if (isset($dataMemory[$_name])) {
+				unset($dataMemory[$_name]);
+			}
+		}
+		if (file_exists($file)) {
+			shell_exec('sudo rm ' . $file);
+		}
+		file_put_contents($file, json_encode($dataMemory, JSON_FORCE_OBJECT));
+		return;
+	}
 
-	public static function listMemory($_id) {
-		$dotti = dotti::byId($_id);
-		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
+	public static function listMemory() {
+		$file = dirname(__FILE__) . '/../../data/collection.json';
 		$dataMemory = array();
 		if (file_exists($file)) {
 			$dataMemory = json_decode(file_get_contents($file), true);
 		}
 		$list = '';
-		$i = 0;
-		while ($i < 256) {
-			$memoryName = $i . ': Mémoire vide';
-			if (isset($dataMemory[$i])) {
-				$memoryName = $i . ' : ' . $dataMemory[$i]['name'];
-			}
-			$list .= '<option value="' . $i . '">Mémoire ' . $memoryName . '</option>';
-			$i++;
+		foreach ($dataMemory as $name=>$data){
+			$list .= '<option value="' . strtolower($name) . '">' . $name . '</option>';
 		}
 		return $list;
 	}
-
-	public static function saveDotti($_memory, $_id, $_name, $_data) {
-		$dotti = dotti::byId($_id);
-		dotti::sendDataRealTime($_data, $_id);
-		sleep(5);
-		$dotti->sendData('saveid', $_memory);
-		$directory = dirname(__FILE__) . '/../../data/';
-		if (!is_dir($directory)) {
-			mkdir($directory);
-		}
-		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $dotti->getConfiguration('mac')) . '.json';
+	
+	public static function getImageData($_name) {
+		$file = dirname(__FILE__) . '/../../data/collection.json';
 		$dataMemory = array();
 		if (file_exists($file)) {
 			$dataMemory = json_decode(file_get_contents($file), true);
 		}
-		$dataMemory[$_memory]['name'] = $_name;
-		$dataMemory[$_memory]['data'] = $_data;
+		$dataColor = '';
+		foreach ($dataMemory as $name=>$data){
+			if (strtolower($_name) == strtolower($name)){
+				foreach ($data as $pixel => $color) {
+					$dataColor[$pixel] = hex2rgb($color);
+				}
+				break;
+			}
+		}
+		log::add('dotti','debug',$dataColor);
+		return $dataColor;
+	}
+
+	public static function saveImage($_id, $_name, $_data) {
+		$dotti = dotti::byId($_id);
+		dotti::sendDataRealTime($_data, $_id);
+		sleep(5);
+		$directory= dirname(__FILE__) . '/../../data/';
+		if (!is_dir($directory)) {
+			mkdir($directory);
+		}
+		$file = dirname(__FILE__) . '/../../data/collection.json';
+		$dataMemory = array();
+		if (file_exists($file)) {
+			$dataMemory = json_decode(file_get_contents($file), true);
+		}
+		$dataMemory[$_name] = $_data;
 		if (file_exists($file)) {
 			shell_exec('sudo rm ' . $file);
 		}
@@ -307,31 +331,17 @@ class dotti extends eqLogic {
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
 
-		$cmd = $this->getCmd(null, 'loadid');
+		$cmd = $this->getCmd(null, 'loadimage');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();
-			$cmd->setLogicalId('loadid');
+			$cmd->setLogicalId('loadimage');
 			$cmd->setIsVisible(1);
 			$cmd->setName(__('Charger Image', __FILE__));
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('message');
 		$cmd->setDisplay('title_disable', 1);
-		$cmd->setDisplay('message_placeholder', __('ID (0 à 255) ou nom', __FILE__));
-		$cmd->setEqLogic_id($this->getId());
-		$cmd->save();
-
-		$cmd = $this->getCmd(null, 'saveid');
-		if (!is_object($cmd)) {
-			$cmd = new dottiCmd();
-			$cmd->setLogicalId('saveid');
-			$cmd->setIsVisible(1);
-			$cmd->setName(__('Sauver Image', __FILE__));
-		}
-		$cmd->setType('action');
-		$cmd->setSubType('message');
-		$cmd->setDisplay('title_disable', 1);
-		$cmd->setDisplay('message_placeholder', __('ID (0 à 255)', __FILE__));
+		$cmd->setDisplay('message_placeholder', __('Nom', __FILE__));
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
 
@@ -348,22 +358,6 @@ class dotti extends eqLogic {
 		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
 		$cmd->setDisplay('message_placeholder', __('Données brute', __FILE__));
 		$cmd->save();
-	}
-
-	public function findIdWithName($_name) {
-		$file = dirname(__FILE__) . '/../../data/' . str_replace(':', '', $this->getConfiguration('mac')) . '.json';
-		$dataMemory = array();
-		$id = -1;
-		if (file_exists($file)) {
-			$dataMemory = json_decode(file_get_contents($file), true);
-		}
-		foreach ($dataMemory as $key => $memory) {
-			if (strtolower($memory['name']) == strtolower($_name)) {
-				$id = $key;
-				break;
-			}
-		}
-		return $id;
 	}
 
 	public function sendData($_type, $_data) {
@@ -440,17 +434,8 @@ class dottiCmd extends cmd {
 			$eqLogic->sendData('display', $data);
 			return;
 		}
-		if (in_array($this->getLogicalId(), array('loadid', 'saveid'))) {
-			if ($this->getLogicalId() == 'loadid') {
-				if (!is_numeric($_options['message'])) {
-					if ($eqLogic->findIdWithName($_options['message']) != -1) {
-						$_options['message'] = $eqLogic->findIdWithName($_options['message']);
-					} else {
-						throw new Exception(__('Ce nom d\'image n\'existe pas ', __FILE__) . $_options['message']);
-					}
-				}
-			}
-			$eqLogic->sendData($this->getLogicalId(), $_options['message']);
+		if ($this->getLogicalId() == 'loadimage'){
+			$eqLogic->sendData('display', dotti::getImageData($_options['message']));
 			return;
 		}
 	}
