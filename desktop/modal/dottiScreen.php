@@ -66,8 +66,7 @@ sendVarToJS('id', init('id'));
 <div class="form-group">
 <select class="memoryload form-control" style="margin-top:5px">
 </select>
-<a class="btn btn-warning" id="bt_loadImage"><i class="fa fa-download"></i> {{Charger une image}}</a>
-<a class="btn btn-danger" id="bt_delImage"><i class="fa fa-trash-o"></i></a>
+<a class="btn btn-danger" id="bt_delImage"><i class="fa fa-trash-o"></i> {{Supprimer l'image}}</a>
 </div>
 </div>
 </center>
@@ -126,7 +125,7 @@ $('#bt_saveImage').on('click', function () {
         });
 });
 
-$('#bt_loadImage').on('click', function () {
+$('.memoryload').on('change', function () {
 	$.ajax({// fonction permettant de faire de l'ajax
 			type: "POST", // methode de transmission des données au fichier php
 			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
