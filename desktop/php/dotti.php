@@ -42,9 +42,10 @@ foreach ($eqLogics as $eqLogic) {
 <div class="eqLogicThumbnailContainer">
   <?php
 foreach ($eqLogics as $eqLogic) {
-	echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >';
+	$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
+	echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;'.$opacity.'" >';
 	echo "<center>";
-	echo '<img src="plugins/dotti/doc/images/dotti_icon.png" height="105" width="95" />';
+	echo '<img src="plugins/dotti/core/template/images/dotti.png" height="105" width="95" />';
 	echo "</center>";
 	echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
 	echo '</div>';
@@ -64,6 +65,8 @@ foreach ($eqLogics as $eqLogic) {
 
   <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
     <div role="tabpanel" class="tab-pane active" id="eqlogictab">
+	 <div class="row">
+	  <div class="col-sm-6">
       <form class="form-horizontal">
         <fieldset>
           <legend><i class="fa fa-arrow-circle-left eqLogicAction cursor" data-action="returnToThumbnailDisplay"></i> {{Général}}  <i class='fa fa-cogs eqLogicAction pull-right cursor expertModeVisible' data-action='configure'></i></legend>
@@ -108,6 +111,13 @@ foreach (object::all() as $object) {
       </div>
     </fieldset>
   </form>
+</div>
+ <div class="col-sm-6">
+  <center>
+    <img src="plugins/dotti/core/template/images/dotti.png" style="height : 400px;margin-top:15px" />
+</center>
+</div>
+</div>
 </div>
 <div role="tabpanel" class="tab-pane" id="commandtab">
   <a class="btn btn-success btn-sm cmdAction  pull-right" data-action="add"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>
