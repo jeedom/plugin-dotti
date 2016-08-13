@@ -283,6 +283,7 @@ class dotti extends eqLogic {
 			$dataMemory = json_decode(file_get_contents($file), true);
 		}
 		$dataMemory[strtolower($_name)] = $_data;
+		ksort($dataMemory);
 		if (file_exists($file)) {
 			shell_exec('sudo rm ' . $file);
 		}
@@ -290,7 +291,6 @@ class dotti extends eqLogic {
 		foreach ($dataMemory as $name=>$data){
 			$array[] = $name;
 		}
-		log::add('dotti','debug', print_r($array,true));
 		foreach (dotti::byType('dotti') as $dotti) {
 			$cmd = $dotti->getCmd('action', 'loadimage');
 			$cmd->setDisplay('title_possibility_list', json_encode($array));
