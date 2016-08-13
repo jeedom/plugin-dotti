@@ -31,7 +31,7 @@
 			loadimage#id# = json_decode('#loadimage#');
 			loadloadimage#id# = '';
 			for(var i in loadimage#id#){
-				loadloadimage#id# += '<option value="' + loadimage#id#[i] + '">' + loadimage#id#[i] + '</option>';
+				loadloadimage#id# += '<option value="' + loadimage#id#[i] + '">' + loadimage#id#[i].charAt(0).toUpperCase() + loadimage#id#[i].slice(1) + '</option>';
 			}
 			$(".dotti[data-eqLogic_uid=#uid#] .memoryload").append(loadloadimage#id#);
 		}
