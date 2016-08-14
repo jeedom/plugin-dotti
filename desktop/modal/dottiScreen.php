@@ -511,7 +511,6 @@ while ($i < 65) {
 				modifyWithoutSave=false;
 				if (data.result){
 					$('.memoryload').empty().append(data.result);
-					console.log(data.result);
 					$('.biblioNumber').empty().append(data.result.split('<option').length-1 + ' icônes');
 				} else {
 					$('.memoryload').empty();
