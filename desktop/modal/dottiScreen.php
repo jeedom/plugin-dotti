@@ -186,19 +186,18 @@ while ($i < 65) {
 });
 
 	function autoLoadJson(){
-		$('.imageDotti').on('change',function(){
-			try {
-				data = json_decode($(this).value());
-				for(var pixelId in data){
-					$('[data-pixel="'+ pixelId +'"]').css('color', data[pixelId]);
-				}
-			}catch (e) {
-
+		try {
+			data = json_decode($(this).value());
+			for(var pixelId in data){
+				$('[data-pixel="'+ pixelId +'"]').css('color', data[pixelId]);
 			}
-		});
+		}catch (e) {
+		}
 	}
-
-	autoLoadJson();
+	
+	$('.imageDotti').on('change',function(){
+		autoLoadJson();
+	}
 
 	$('#bt_Import').on('click', function () {
 		$('.imageDotti').show();
