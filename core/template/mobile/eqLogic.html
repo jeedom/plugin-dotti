@@ -28,7 +28,7 @@
 			$(".dotti[data-eqLogic_uid=#uid#] .memoryload#uid#").append(loadloadimage#id#);
 		}
 	$('.dotti[data-eqLogic_uid=#uid#] .memoryload#uid#').on('change',function(){
-		jeedom.cmd.execute({id: '#cmd_loadimage_id#', value: {'message': $(this).value()}});
+		jeedom.cmd.execute({id: '#cmd_loadimage_id#', value: {'title': $(this).value()}});
 	});
 	$('#bt_sendtext#uid#').on('click',function(){
 		console.log($('.name#uid#').val());
