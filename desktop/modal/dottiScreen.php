@@ -80,7 +80,7 @@ while ($i < 65) {
 			<a class="btn btn-warning" id="bt_sendAll"><i class="fa fa-paint-brush"></i> {{Afficher sur le Dotti}}</a>
 			<a class="btn btn-success" id="bt_displayExport"><i class="fa fa-download"></i></a>
 			<a class="btn btn-danger" id="bt_Import"><i class="fa fa-upload"></i></a>
-			<span class="biblioNumber pull-right label label-info" style="font-size:1em">
+			<span class="biblioNumber pull-right label label-info" style="font-size:1em;cursor:pointer">
 			</span>
 		</div>
 		<div class="form-group">
@@ -179,6 +179,11 @@ while ($i < 65) {
 		$('.uploadimageDotti').hide();
 		getImageCode();
 	});
+	
+	$('.biblioNumber').on('click', function () {
+    $('#md_modal2').dialog({title: "{{Votre Collection}}"});
+    $('#md_modal2').load('index.php?v=d&plugin=dotti&modal=dottiAll').dialog('open');
+});
 
 	function autoLoadJson(){
 		$('.imageDotti').on('change',function(){
