@@ -281,7 +281,7 @@ class dotti extends eqLogic {
 		return $dataColor;
 	}
 
-	public static function saveImage($_id, $_name, $_data) {
+	public static function saveImage($_id, $_name, $_data, $_isjson = false) {
 		$dotti = dotti::byId($_id);
 		dotti::sendDataRealTime($_data, $_id);
 		sleep(5);
@@ -293,6 +293,9 @@ class dotti extends eqLogic {
 		$dataMemory = array();
 		if (file_exists($file)) {
 			$dataMemory = json_decode(file_get_contents($file), true);
+		}
+		if ($_isjson){
+			$_data = json_decode($_data, true);
 		}
 		$dataMemory[strtolower($_name)] = $_data;
 		ksort($dataMemory);

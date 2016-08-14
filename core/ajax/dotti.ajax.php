@@ -41,6 +41,17 @@ try {
 		}
 	}
 	
+	if (init('action') == 'saveImagejson') {
+		$id = init('id');
+		$name = init('name');
+		$data = init('data');
+		if ($name == ''){
+			ajax::error('Veuillez choisir un nom pour votre image');
+		} else {
+			ajax::success(dotti::saveImage($id,$name,$data,true));
+		}
+	}
+	
 	if (init('action') == 'delImage') {
 		$name = init('name');
 		ajax::success(dotti::delImage($name));

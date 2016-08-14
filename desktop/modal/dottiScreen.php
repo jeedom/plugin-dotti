@@ -79,7 +79,7 @@ sendVarToJS('id', init('id'));
 <div class="form-group">
 <a class="btn btn-success" id="bt_displayExport"><i class="fa fa-download"></i></a>
 <a class="btn btn-danger" id="bt_Import"><i class="fa fa-upload"></i></a>
-<textarea class="imageDotti" style="display:none;height:50px"></textarea></br>
+<textarea class="imageDotti" style="display:none"></textarea></br>
 <a class="btn btn-success uploadimageDotti" id="bt_upload" style="display:none"><i class="fa fa-upload"></i>  {{Envoyer}}</a>
 <a class="btn btn-danger closeimageDotti" id="bt_close" style="display:none"><i class="fa fa-times"></i></a>
 </div>
@@ -172,7 +172,7 @@ $('#bt_upload').on('click', function () {
 			type: "POST", // methode de transmission des données au fichier php
 			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
 			data: {
-				action: "saveImage",
+				action: "saveImagejson",
 				id: id,
 				name: $('.nameDottiScreen').val(),
 				data : $('.imageDotti').val()
