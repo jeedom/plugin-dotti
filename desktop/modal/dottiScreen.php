@@ -197,7 +197,7 @@ while ($i < 65) {
 	
 	$('.imageDotti').on('change',function(){
 		autoLoadJson();
-	}
+	});
 
 	$('#bt_Import').on('click', function () {
 		$('.imageDotti').show();
