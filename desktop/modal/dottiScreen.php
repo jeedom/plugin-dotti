@@ -325,6 +325,7 @@ while ($i < 65) {
 	$('.memoryload').on('change', function () {
 		getImageCode();
 		loadImage();
+		setTimeout(function() { sendAll() }, 500);
 	});
 
 	$('#bt_delImage').on('click', function () {
@@ -441,13 +442,17 @@ while ($i < 65) {
 	})
 
 	$('#bt_sendAll').on('click', function() {
+		sendAll();
+	});
+	
+	function sendAll() {
 		var array = {};
 		$('.pixel').each(function( index ) {
 			array[$(this).attr('data-pixel')] = hexc($(this).css('color'));
 		});
 		sendPixelArray(array,id);
-	})
-
+	}
+	
 	function hexc(colorval) {
 		var parts = colorval.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 		delete(parts[0]);
