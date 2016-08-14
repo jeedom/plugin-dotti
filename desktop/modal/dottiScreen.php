@@ -39,10 +39,10 @@ sendVarToJS('id', init('id'));
 			<a class="btn btn-xs btn-warning replacecolor" id="bt_replace" style="margin-left:20px;"><i class="fa fa-flask"></i> {{Pot de peinture}}</a>
 		</div>
 		<div class="form-group">
-			<a class="btn btn-xs btn-danger erasecolor" id="bt_erase" style="margin-left:20px"><i class="fa fa-eraser"></i> {{Gommer}}</a>
+			<a class="btn btn-xs btn-success copycolor" id="bt_copyColor" style="margin-left:20px"><i class="fa fa-pencil"></i> {{Pipette}}</a>
 		</div>
 		<div class="form-group">
-			<a class="btn btn-xs btn-warning copycolor" id="bt_copyColor" style="margin-left:20px"><i class="fa fa-pencil"></i> {{Pipette}}</a>
+			<a class="btn btn-xs btn-danger erasecolor" id="bt_erase" style="margin-left:20px"><i class="fa fa-eraser"></i> {{Gommer}}</a>
 		</div>
 		<div class="form-group">
 			<label class="checkbox-inline"><input class="realtime" type="checkbox" unchecked />{{Temps réel}}</label>
