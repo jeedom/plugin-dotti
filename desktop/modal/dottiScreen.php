@@ -60,7 +60,7 @@ sendVarToJS('id', init('id'));
 </div>
 <div class="form-group">
 	<label class="control-label">{{Nom de l'image}}</label>
-   <input class="name form-control" id="texte" type='text'/>
+   <input class="nameDottiScreen form-control" id="texte" type='text'/>
 	<a class="btn btn-success" id="bt_saveImage"><i class="fa fa-floppy-o"></i> {{Sauver l'image}}</a>
 </div>
 <div class="form-group">
@@ -77,13 +77,13 @@ $('#bt_saveImage').on('click', function () {
 	 $('.pixel').each(function( index ) {
 		 array[$(this).attr('data-pixel')] = hexc($(this).css('color'));
 	});
-	if ($('.name').val() == ''){
+	if ($('.nameDottiScreen').val() == ''){
 		$('.eventDisplay').showAlert({message:  'Vous devez spécifier un nom pour sauver une image',level: 'danger'});
 		return;
 	}
 	bootbox.dialog({
             title: 'Etes-vous sur ?',
-            message: 'Vous allez sauver l\'image avec le nom "' +$('.name').val() +'" ! Voulez-vous continuer ?',
+            message: 'Vous allez sauver l\'image avec le nom "' +$('.nameDottiScreen').val() +'" ! Voulez-vous continuer ?',
             buttons: {
                 "{{Annuler}}": {
                     className: "btn-danger",
@@ -101,7 +101,7 @@ $('#bt_saveImage').on('click', function () {
 			data: {
 				action: "saveImage",
 				id: id,
-				name: $('.name').val(),
+				name: $('.nameDottiScreen').val(),
 				data : array
 			},
 			global : false,
@@ -149,7 +149,7 @@ $('.memoryload').on('change', function () {
 					$('[data-pixel="'+ pixelId.toString() +'"]').css('color', data.result[pixelId]);
 				}
 			}
-			$('.name').val($('.memoryload').find('option:selected').text());
+			$('.nameDottiScreen').val($('.memoryload').find('option:selected').text());
             modifyWithoutSave=false;
         }
     });
