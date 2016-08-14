@@ -325,7 +325,9 @@ while ($i < 65) {
 	$('.memoryload').on('change', function () {
 		getImageCode();
 		loadImage();
-		setTimeout(function() { sendAll() }, 500);
+		if ($('.realtime').is(':checked')){
+			setTimeout(function() { sendAll() }, 500);
+		}
 	});
 
 	$('#bt_delImage').on('click', function () {
