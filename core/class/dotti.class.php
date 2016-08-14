@@ -24,7 +24,7 @@ class dotti extends eqLogic {
 
 	/*     * ***********************Methode static*************************** */
 	public static $_widgetPossibility = array('custom' => true);
-	
+
 	public static function dependancy_info() {
 		$return = array();
 		$return['log'] = 'dotti_update';
@@ -222,7 +222,7 @@ class dotti extends eqLogic {
 		}
 		return $dataColor;
 	}
-	
+
 	public static function getImageCode($_name) {
 		$file = dirname(__FILE__) . '/../../data/collection.json';
 		$dataColor = array();
@@ -234,7 +234,7 @@ class dotti extends eqLogic {
 		}
 		return json_encode($dataColor, JSON_FORCE_OBJECT);
 	}
-	
+
 	public static function delImage($_name) {
 		$file = dirname(__FILE__) . '/../../data/collection.json';
 		if (file_exists($file)) {
@@ -257,12 +257,12 @@ class dotti extends eqLogic {
 			$dataMemory = json_decode(file_get_contents($file), true);
 		}
 		$list = '';
-		foreach ($dataMemory as $name=>$data){
+		foreach ($dataMemory as $name => $data) {
 			$list .= '<option value="' . strtolower($name) . '">' . ucfirst($name) . '</option>';
 		}
 		return $list;
 	}
-	
+
 	public static function getImageData($_name) {
 		$file = dirname(__FILE__) . '/../../data/collection.json';
 		$dataMemory = array();
@@ -270,8 +270,8 @@ class dotti extends eqLogic {
 			$dataMemory = json_decode(file_get_contents($file), true);
 		}
 		$dataColor = '';
-		foreach ($dataMemory as $name=>$data){
-			if (strtolower($_name) == strtolower($name)){
+		foreach ($dataMemory as $name => $data) {
+			if (strtolower($_name) == strtolower($name)) {
 				foreach ($data as $pixel => $color) {
 					$dataColor[$pixel] = hex2rgb($color);
 				}
@@ -283,12 +283,12 @@ class dotti extends eqLogic {
 
 	public static function saveImage($_id, $_name, $_data, $_isjson = false) {
 		$dotti = dotti::byId($_id);
-		try{
+		try {
 			dotti::sendDataRealTime($_data, $_id);
-		} catch(Exception $e){
+		} catch (Exception $e) {
 		}
 		sleep(5);
-		$directory= dirname(__FILE__) . '/../../data/';
+		$directory = dirname(__FILE__) . '/../../data/';
 		if (!is_dir($directory)) {
 			mkdir($directory);
 		}
@@ -297,7 +297,7 @@ class dotti extends eqLogic {
 		if (file_exists($file)) {
 			$dataMemory = json_decode(file_get_contents($file), true);
 		}
-		if ($_isjson){
+		if ($_isjson) {
 			$_data = json_decode($_data, true);
 		}
 		$dataMemory[strtolower($_name)] = $_data;
@@ -306,7 +306,7 @@ class dotti extends eqLogic {
 			shell_exec('sudo rm ' . $file);
 		}
 		$array = array();
-		foreach ($dataMemory as $name=>$data){
+		foreach ($dataMemory as $name => $data) {
 			$array[] = $name;
 		}
 		foreach (dotti::byType('dotti') as $dotti) {
@@ -319,7 +319,7 @@ class dotti extends eqLogic {
 
 	/*     * *********************Méthodes d'instance************************* */
 	public function preSave() {
-		$this->setCategory('multimedia',1);
+		$this->setCategory('multimedia', 1);
 	}
 	public function postSave() {
 		$cmd = $this->getCmd(null, 'sendtext');
@@ -334,7 +334,7 @@ class dotti extends eqLogic {
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
 		$cmd->save();
-		
+
 		$cmd = $this->getCmd(null, 'sendrandom');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();
@@ -348,7 +348,7 @@ class dotti extends eqLogic {
 		$cmd->setDisplay('message_placeholder', __('Vide ou liste d\'icône sépraré par ;', __FILE__));
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
-		
+
 		$cmd = $this->getCmd(null, 'sendcolor');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();
@@ -437,7 +437,7 @@ class dotti extends eqLogic {
 		socket_write($socket, $value, strlen($value));
 		socket_close($socket);
 	}
-	
+
 	public function toHtml($_version = 'dashboard') {
 		$replace = $this->preToHtml($_version);
 		if (!is_array($replace)) {
@@ -511,26 +511,26 @@ class dottiCmd extends cmd {
 			$eqLogic->sendData('display', $data);
 			return;
 		}
-		if ($this->getLogicalId() == 'loadimage'){
-			$eqLogic->sendData('display', dotti::getImageData($_options['message']));
+		if ($this->getLogicalId() == 'loadimage') {
+			$eqLogic->sendData('display', dotti::getImageData($_options['title']));
 			return;
 		}
-		if ($this->getLogicalId() == 'sendcolor'){
+		if ($this->getLogicalId() == 'sendcolor') {
 			$eqLogic->sendData('color', hex2rgb($_options['color']));
 			return;
 		}
-		if ($this->getLogicalId() == 'sendrandom'){
-			if ($_options['message'] == ''){
+		if ($this->getLogicalId() == 'sendrandom') {
+			if ($_options['message'] == '') {
 				$file = dirname(__FILE__) . '/../../data/collection.json';
 				$dataMemory = array();
 				if (file_exists($file)) {
 					$dataMemory = json_decode(file_get_contents($file), true);
 				}
-				foreach ($dataMemory as $name=>$data){
+				foreach ($dataMemory as $name => $data) {
 					$arrayicon[] = $name;
 				}
 			} else {
-				$arrayicon = explode(';',$_options['message']);
+				$arrayicon = explode(';', $_options['message']);
 			}
 			$eqLogic->sendData('display', dotti::getImageData($arrayicon[array_rand($arrayicon)]));
 			return;
