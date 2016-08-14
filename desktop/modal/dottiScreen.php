@@ -27,7 +27,15 @@ sendVarToJS('id', init('id'));
  <div class="col-lg-2">
  <div class="form-group">
 <span style="margin-right:15px;"><label class="fa fa-circle pixelCircle" style="color : #000000;font-size:2em; margin-top:10px;margin-left:15px; cursor: pointer;"><input class="pixelcolor" type="color" value="#000000" style="width:0;height:0;visibility:hidden"></label>{{Couleur}}</span>
-<a class="btn btn-xs btn-danger" id="bt_fill"><i class="fa fa-tint"></i> {{Remplir}}</a>
+</div>
+<div class="form-group">
+<a class="btn btn-xs btn-success" id="bt_fill" style="margin-left:20px"><i class="fa fa-tint"></i> {{Remplir}}</a>
+</div>
+<div class="form-group">
+<a class="btn btn-xs btn-warning" id="bt_copyColor" style="margin-left:20px"><i class="fa fa-pencil"></i> {{Pipette}}</a>
+</div>
+<div class="form-group">
+<a class="btn btn-xs btn-danger" id="bt_erase" style="margin-left:20px"><i class="fa fa-eraser"></i> {{Gommer}}</a>
 </div>
 <div class="form-group">
 <label class="checkbox-inline"><input class="realtime" type="checkbox" unchecked />{{Temps réel}}</label>
@@ -72,6 +80,8 @@ sendVarToJS('id', init('id'));
 </center>
 <script>
 loadMemoryList(id);
+var pencil = 0;
+var erase = 0;
 $('.realimage').on('change', function () {
 	if ($(this).is(':checked')){
 		$('.pixel').css('margin-top' , '-16px');
@@ -81,6 +91,26 @@ $('.realimage').on('change', function () {
 		$('.pixel').css('margin-top' , '10px');
 		$('.pixel').css('margin-left' , '15px');
 		$('.pixel').attr('class', 'fa fa-square pixel');
+	}
+});
+$('#bt_erase').on('click', function () {
+	if (erase == 0){
+		erase = 1;
+		pencil = 0;
+		$('.eventDisplay').empty().append('<div class="alert alert-danger"><strong>Vous êtes en mode gomme. Effacer les pixels que vous voulez puis recliquez sur Gommer pour sortir du mode</strong></div>');
+	} else {
+		erase = 0;
+		$('.eventDisplay').empty();
+	}
+});
+$('#bt_copyColor').on('click', function () {
+	if (pencil == 0){
+		pencil = 1;
+		erase =0;
+		$('.eventDisplay').empty().append('<div class="alert alert-warning"><strong>Vous êtes en mode pipette. Choisissez la couleur ou sortez du mode en recliquant sur Pipette</strong></div>');
+	} else {
+		pencil = 0;
+		$('.eventDisplay').empty();
 	}
 });
 $('#bt_saveImage').on('click', function () {
@@ -210,10 +240,21 @@ $('#bt_delImage').on('click', function () {
 
  $('.pixel').on('click', function() {
 	var pixelId = $(this).attr('data-pixel');
-	$(this).css('color', $('.pixelcolor').val())
+	var color = $('.pixelCircle').css('color');
+	if (erase == 1){
+		color ='#000000';
+	}
+	if (pencil == 1){
+		$('.pixelCircle').css('color', $(this).css('color'));
+		$('.pixelcolor').val(hexc($(this).css('color')));
+		pencil = 0;
+		$('.eventDisplay').empty();
+		return;
+	}
+	$(this).css('color', color);
 	if ($('.realtime').is(':checked')){
 		var array = {};
-		array[pixelId.toString()] = $('.pixelcolor').val();
+		array[pixelId.toString()] = color;
 		sendPixelArray(array,id);
 	}
 })
@@ -224,7 +265,7 @@ $('#bt_delImage').on('click', function () {
 
 $('#bt_fill').on('click', function() {
 	$('.pixel').each(function( index ) {
-		 $(this).css('color', $('.pixelcolor').val());
+		 $(this).css('color', $('.pixelCircle').css('color'));
 	});
 	if ($('.realtime').is(':checked')){
 	 var array = {};
