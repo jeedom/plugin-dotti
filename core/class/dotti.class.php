@@ -223,6 +223,18 @@ class dotti extends eqLogic {
 		return $dataColor;
 	}
 	
+	public static function getImageCode($_name) {
+		$file = dirname(__FILE__) . '/../../data/collection.json';
+		$dataColor = array();
+		if (file_exists($file)) {
+			$dataMemory = json_decode(file_get_contents($file), true);
+			if (isset($dataMemory[$_name])) {
+				$dataColor = $dataMemory[$_name];
+			}
+		}
+		return json_encode($dataColor, JSON_FORCE_OBJECT);
+	}
+	
 	public static function delImage($_name) {
 		$file = dirname(__FILE__) . '/../../data/collection.json';
 		if (file_exists($file)) {

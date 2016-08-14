@@ -76,6 +76,13 @@ sendVarToJS('id', init('id'));
 </select>
 <a class="btn btn-danger" id="bt_delImage"><i class="fa fa-trash-o"></i> {{Supprimer l'image}}</a>
 </div>
+<div class="form-group">
+<a class="btn btn-success" id="bt_displayExport"><i class="fa fa-download"></i></a>
+<a class="btn btn-danger" id="bt_Import"><i class="fa fa-upload"></i></a>
+<textarea class="imageDotti" style="display:none;height:50px"></textarea></br>
+<a class="btn btn-success uploadimageDotti" id="bt_upload" style="display:none"><i class="fa fa-upload"></i>  {{Envoyer}}</a>
+<a class="btn btn-danger closeimageDotti" id="bt_close" style="display:none"><i class="fa fa-times"></i></a>
+</div>
 </div>
 </center>
 <script>
@@ -102,6 +109,93 @@ $('#bt_erase').on('click', function () {
 		erase = 0;
 		$('.eventDisplay').empty();
 	}
+});
+$('#bt_displayExport').on('click', function () {
+	$('.imageDotti').show();
+	$('.closeimageDotti').show();
+	$('.uploadimageDotti').hide();
+	$('.imageDotti').val('');
+	$.ajax({// fonction permettant de faire de l'ajax
+			type: "POST", // methode de transmission des données au fichier php
+			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
+			data: {
+				action: "getImageCode",
+				name: $('.memoryload').val()
+			},
+			dataType: 'json',
+			global: false,
+			error: function(request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+        success: function(data) { // si l'appel a bien fonctionné
+            if (data.state != 'ok') {
+            	$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
+                return;
+            }
+			$('.imageDotti').val(data.result);
+            modifyWithoutSave=false;
+        }
+    });
+    
+});
+$('#bt_Import').on('click', function () {
+	$('.imageDotti').show();
+	$('.closeimageDotti').show();
+	$('.uploadimageDotti').show();
+	$('.imageDotti').val('');
+});
+$('#bt_close').on('click', function () {
+	$('.imageDotti').hide();
+	$('.closeimageDotti').hide();
+	$('.uploadimageDotti').hide();  
+});
+$('#bt_upload').on('click', function () {
+	if ($('.nameDottiScreen').val() == ''){
+		$('.eventDisplay').showAlert({message:  'Vous devez spécifier un nom pour sauver une image',level: 'danger'});
+		return;
+	}
+	bootbox.dialog({
+            title: 'Etes-vous sur ?',
+            message: 'Vous allez sauver l\'image avec le nom "' +$('.nameDottiScreen').val() +'" ! Voulez-vous continuer ?',
+            buttons: {
+                "{{Annuler}}": {
+                    className: "btn-danger",
+                    callback: function () {
+                    }
+                },
+                success: {
+                    label: "{{Continuer}}",
+                    className: "btn-success",
+                    callback: function () {
+						$('.eventDisplay').showAlert({message:  'Affichage sur le Dotti en cours ...',level: 'warning'});
+                        $.ajax({// fonction permettant de faire de l'ajax
+			type: "POST", // methode de transmission des données au fichier php
+			url: "plugins/dotti/core/ajax/dotti.ajax.php", // url du fichier php
+			data: {
+				action: "saveImage",
+				id: id,
+				name: $('.nameDottiScreen').val(),
+				data : $('.imageDotti').val()
+			},
+			global : false,
+			dataType: 'json',
+			error: function(request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+        success: function(data) { // si l'appel a bien fonctionné
+            if (data.state != 'ok') {
+            	$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
+                return;
+            }
+			$('.eventDisplay').showAlert({message:  'Sauvegarde effectuée' ,level: 'success'});
+            modifyWithoutSave=false;
+			loadMemoryList(id);
+        }
+    });
+                    }
+                },
+            }
+        });
 });
 $('#bt_copyColor').on('click', function () {
 	if (pencil == 0){

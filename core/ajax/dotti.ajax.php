@@ -34,7 +34,6 @@ try {
 		$id = init('id');
 		$name = init('name');
 		$data = init('data');
-		$dotti = dotti::byId($id);
 		if ($name == ''){
 			ajax::error('Veuillez choisir un nom pour votre image');
 		} else {
@@ -55,6 +54,17 @@ try {
 		$array = init('array');
 		$id = init('id');
 		ajax::success(dotti::sendDataRealTime($array,$id));
+	}
+	
+	if (init('action') == 'getImageCode') {
+		$name = init('name');
+		ajax::success(dotti::getImageCode($name));
+	}
+	
+	if (init('action') == 'loadImageCode') {
+		$name = init('name');
+		$data = init('data');
+		ajax::success(dotti::loadImageCode($name,$data));
 	}
 
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
