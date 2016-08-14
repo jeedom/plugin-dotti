@@ -30,10 +30,10 @@ sendVarToJS('id', init('id'));
 <a class="btn btn-xs btn-danger" id="bt_fill"><i class="fa fa-tint"></i> {{Remplir}}</a>
 </div>
 <div class="form-group">
-
+<label class="checkbox-inline"><input class="realtime" type="checkbox" unchecked />{{Temps réel}}</label>
 </div>
 <div class="form-group">
-<label class="checkbox-inline"><input class="realtime" type="checkbox" unchecked />{{Temps réel}}</label>
+<label class="checkbox-inline"><input class="realimage" type="checkbox" unchecked />{{Regrouper pixel}}</label>
 </div>
 </div>
  <div class="col-lg-8">
@@ -43,7 +43,7 @@ sendVarToJS('id', init('id'));
 	while ($i < 65){
 		$j=1;
 		while ($j < 9){
-			echo '<label class="fa fa-square pixel" data-pixel="' . $i .'" style="color : #000000;font-size:5em; margin-top:10px;margin-left:15px; cursor: pointer;"></label>  ';
+			echo '<label class="fa fa-square pixel" data-pixel="' . $i .'" style="color : #000000;font-size:5em; margin-top:10px;margin-left:15px; cursor: pointer;border-radius:0"></label>  ';
 			$j++;
 			
 		$i++;
@@ -72,6 +72,17 @@ sendVarToJS('id', init('id'));
 </center>
 <script>
 loadMemoryList(id);
+$('.realimage').on('change', function () {
+	if ($(this).is(':checked')){
+		$('.pixel').css('margin-top' , '-16px');
+		$('.pixel').css('margin-left' , '-5px');
+		$('.pixel').attr('class', 'fa fa-stop pixel');
+	} else {
+		$('.pixel').css('margin-top' , '10px');
+		$('.pixel').css('margin-left' , '15px');
+		$('.pixel').attr('class', 'fa fa-square pixel');
+	}
+});
 $('#bt_saveImage').on('click', function () {
 	var array = {};
 	 $('.pixel').each(function( index ) {
