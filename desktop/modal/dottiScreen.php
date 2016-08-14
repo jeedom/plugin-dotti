@@ -23,7 +23,7 @@ if (init('id') == '') {
 }
 sendVarToJS('id', init('id'));
 ?>
-<div class="eventDisplay"></div>
+
 <div class="row" style="height:100%; width: 100%">
 	<div class="col-lg-2">
 		<div class="form-group">
@@ -49,6 +49,9 @@ sendVarToJS('id', init('id'));
 		</div>
 		<div class="form-group">
 			<label class="checkbox-inline"><input class="realimage" type="checkbox" unchecked />{{Regrouper pixel}}</label>
+		</div>
+		<div class="form-group">
+			<div class="eventDisplay"></div>
 		</div>
 	</div>
 	<div class="col-lg-6">
@@ -77,6 +80,8 @@ while ($i < 65) {
 			<a class="btn btn-warning" id="bt_sendAll"><i class="fa fa-paint-brush"></i> {{Afficher sur le Dotti}}</a>
 			<a class="btn btn-success" id="bt_displayExport"><i class="fa fa-download"></i></a>
 			<a class="btn btn-danger" id="bt_Import"><i class="fa fa-upload"></i></a>
+			<span class="biblioNumber pull-right label label-info" style="font-size:1em">
+			</span>
 		</div>
 		<div class="form-group">
 			<div class="input-group">
@@ -506,6 +511,8 @@ while ($i < 65) {
 				modifyWithoutSave=false;
 				if (data.result){
 					$('.memoryload').empty().append(data.result);
+					console.log(data.result);
+					$('.biblioNumber').empty().append(data.result.split('<option').length-1 + ' icônes');
 				} else {
 					$('.memoryload').empty();
 				}
