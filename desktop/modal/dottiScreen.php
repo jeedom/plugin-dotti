@@ -24,7 +24,7 @@ if (init('id') == '') {
 sendVarToJS('id', init('id'));
 ?>
 <div class="eventDisplay"></div>
-<div class="row" style="height:100%; width: 100%;background: #303132!important;">
+<div class="row" style="height:100%; width: 100%">
 	<div class="col-lg-2">
 		<div class="form-group">
 			<span style="margin-right:15px;"><label class="fa fa-circle pixelCircle" style="color : #000000;font-size:2em; margin-top:10px;margin-left:15px; cursor: pointer;"><input class="pixelcolor" type="color" value="#000000" style="width:0;height:0;visibility:hidden"></label>{{Couleur}}</span>
@@ -33,10 +33,16 @@ sendVarToJS('id', init('id'));
 			<a class="btn btn-xs btn-success" id="bt_fill" style="margin-left:20px"><i class="fa fa-tint"></i> {{Remplir}}</a>
 		</div>
 		<div class="form-group">
-			<a class="btn btn-xs btn-warning" id="bt_copyColor" style="margin-left:20px"><i class="fa fa-pencil"></i> {{Pipette}}</a>
+			<a class="btn btn-xs btn-danger" id="bt_fillblack" style="margin-left:20px"><i class="fa fa-times"></i> {{Vider}}</a>
 		</div>
 		<div class="form-group">
-			<a class="btn btn-xs btn-danger" id="bt_erase" style="margin-left:20px"><i class="fa fa-eraser"></i> {{Gommer}}</a>
+			<a class="btn btn-xs btn-warning replacecolor" id="bt_replace" style="margin-left:20px;"><i class="fa fa-flask"></i> {{Pot de peinture}}</a>
+		</div>
+		<div class="form-group">
+			<a class="btn btn-xs btn-danger erasecolor" id="bt_erase" style="margin-left:20px"><i class="fa fa-eraser"></i> {{Gommer}}</a>
+		</div>
+		<div class="form-group">
+			<a class="btn btn-xs btn-warning copycolor" id="bt_copyColor" style="margin-left:20px"><i class="fa fa-pencil"></i> {{Pipette}}</a>
 		</div>
 		<div class="form-group">
 			<label class="checkbox-inline"><input class="realtime" type="checkbox" unchecked />{{Temps réel}}</label>
@@ -52,10 +58,14 @@ $i = 1;
 while ($i < 65) {
 	$j = 1;
 	while ($j < 9) {
-		echo '<label class="fa fa-square pixel" data-pixel="' . $i . '" style="color : #000000;font-size:5em; margin-top:10px;margin-left:15px; cursor: pointer;border-radius:0"></label>  ';
+		$notfirstline = ' pixelFirstLine';
+		if ($i >= 9){
+			$notfirstline = ' pixelNotFirstLine';
+		}
+		echo '<label class="fa fa-square pixel' . $notfirstline .'" data-pixel="' . $i . '" style="color : #000000;font-size:4.6em; margin-top:10px;margin-left:15px; cursor: pointer;border-radius:0"></label>  ';
 		$j++;
-
 		$i++;
+		
 	}
 	echo '<br/>';
 }
@@ -93,57 +103,76 @@ while ($i < 65) {
 </div>
 <script>
 	loadMemoryList(id);
+	setTimeout(function() { loadImage()}, 200);
 	var pencil = 0;
 	var erase = 0;
+	var replace = 0;
 	$('.realimage').on('change', function () {
 		if ($(this).is(':checked')){
-			$('.pixel').css('margin-top' , '-16px');
-			$('.pixel').css('margin-left' , '-5px');
-			$('.pixel').attr('class', 'fa fa-stop pixel');
+			$('.pixelNotFirstLine').css('margin-top' , '-17px');
+			$('.pixel').css('margin-left' , '-6px');
+			$('.pixelFirstLine').attr('class', 'fa fa-stop pixel pixelFirstLine');
+			$('.pixelNotFirstLine').attr('class', 'fa fa-stop pixel pixelNotFirstLine');
 		} else {
 			$('.pixel').css('margin-top' , '10px');
 			$('.pixel').css('margin-left' , '15px');
-			$('.pixel').attr('class', 'fa fa-square pixel');
+			$('.pixelFirstLine').attr('class', 'fa fa-square pixel pixelFirstLine');
+			$('.pixelNotFirstLine').attr('class', 'fa fa-square pixel pixelNotFirstLine');
 		}
 	});
 	$('#bt_erase').on('click', function () {
 		if (erase == 0){
 			erase = 1;
 			pencil = 0;
-			$('.eventDisplay').empty().append('<div class="alert alert-danger"><strong>Vous êtes en mode gomme. Effacer les pixels que vous voulez puis recliquez sur Gommer pour sortir du mode</strong></div>');
+			replace = 0;
+			$('.erasecolor').css('color' , '#000080');
+			$('.replacecolor').css('color' , '');
+			$('.copycolor').css('color' , '');
+			$('.eventDisplay').hideAlert();
+			$('.eventDisplay').showAlert({message:  'Vous êtes en mode gomme. Effacer les pixels que vous voulez puis recliquez sur Gommer pour sortir du mode',level: 'danger'});
 		} else {
 			erase = 0;
-			$('.eventDisplay').empty();
+			$('.erasecolor').css('color' , '');
+			$('.eventDisplay').hideAlert();
+		}
+	});
+	$('#bt_replace').on('click', function () {
+		if (replace == 0){
+			replace = 1;
+			pencil = 0;
+			erase = 0;
+			$('.replacecolor').css('color' , '#000080');
+			$('.erasecolor').css('color' , '');
+			$('.copycolor').css('color' , '');
+			$('.eventDisplay').hideAlert();
+			$('.eventDisplay').showAlert({message:  'Vous êtes en mode pot de peinture. Cliquez sur une couleur à remplacer',level: 'warning'});
+		} else {
+			replace = 0;
+			$('.replacecolor').css('color' , '');
+			$('.eventDisplay').hideAlert();
+		}
+	});
+	$('#bt_copyColor').on('click', function () {
+		if (pencil == 0){
+			pencil = 1;
+			erase =0;
+			replace = 0;
+			$('.copycolor').css('color' , '#000080');
+			$('.replacecolor').css('color' , '');
+			$('.erasecolor').css('color' , '');
+			$('.eventDisplay').hideAlert();
+			$('.eventDisplay').showAlert({message:  'Vous êtes en mode pipette. Choisissez la couleur ou sortez du mode en recliquant sur Pipette',level: 'warning'});
+		} else {
+			pencil = 0;
+			$('.eventDisplay').hideAlert();
+			$('.copycolor').css('color' , '');
 		}
 	});
 	$('#bt_displayExport').on('click', function () {
 		$('.imageDotti').show();
 		$('.closeimageDotti').show();
 		$('.uploadimageDotti').hide();
-		$('.imageDotti').val('');
-		$.ajax({
-			type: "POST",
-			url: "plugins/dotti/core/ajax/dotti.ajax.php",
-			data: {
-				action: "getImageCode",
-				name: $('.memoryload').val()
-			},
-			dataType: 'json',
-			global: false,
-			error: function(request, status, error) {
-				handleAjaxError(request, status, error);
-			},
-			success: function(data) {
-				if (data.state != 'ok') {
-					$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
-					return;
-				}
-				$('.imageDotti').off('change');
-				$('.imageDotti').val(data.result);
-				autoLoadJson();
-				modifyWithoutSave=false;
-			}
-		});
+		getImageCode();
 	});
 
 	function autoLoadJson(){
@@ -209,9 +238,11 @@ while ($i < 65) {
 							success: function(data) {
 								if (data.state != 'ok') {
 									$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
+									setTimeout(function() { deleteAlert()}, 2000);
 									return;
 								}
 								$('.eventDisplay').showAlert({message:  'Sauvegarde effectuée' ,level: 'success'});
+								setTimeout(function() { deleteAlert()}, 2000);
 								modifyWithoutSave=false;
 								loadMemoryList(id);
 								$('.imageDotti').hide();
@@ -224,16 +255,7 @@ while ($i < 65) {
 			}
 		});
 	});
-	$('#bt_copyColor').on('click', function () {
-		if (pencil == 0){
-			pencil = 1;
-			erase =0;
-			$('.eventDisplay').empty().append('<div class="alert alert-warning"><strong>Vous êtes en mode pipette. Choisissez la couleur ou sortez du mode en recliquant sur Pipette</strong></div>');
-		} else {
-			pencil = 0;
-			$('.eventDisplay').empty();
-		}
-	});
+	
 	$('#bt_saveImage').on('click', function () {
 		var array = {};
 		$('.pixel').each(function( index ) {
@@ -241,6 +263,7 @@ while ($i < 65) {
 		});
 		if ($('.nameDottiScreen').val() == ''){
 			$('.eventDisplay').showAlert({message:  'Vous devez spécifier un nom pour sauver une image',level: 'danger'});
+			setTimeout(function() { deleteAlert()}, 2000);
 			return;
 		}
 		bootbox.dialog({
@@ -274,9 +297,11 @@ while ($i < 65) {
 							success: function(data) {
 								if (data.state != 'ok') {
 									$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
+									setTimeout(function() { deleteAlert()}, 2000);
 									return;
 								}
 								$('.eventDisplay').showAlert({message:  'Sauvegarde effectuée' ,level: 'success'});
+								setTimeout(function() { deleteAlert() }, 2000);
 								modifyWithoutSave=false;
 								loadMemoryList(id);
 							}
@@ -288,33 +313,8 @@ while ($i < 65) {
 	});
 
 	$('.memoryload').on('change', function () {
-		$.ajax({
-			type: "POST",
-			url: "plugins/dotti/core/ajax/dotti.ajax.php",
-			data: {
-				action: "loadImage",
-				id: id,
-				name: $('.memoryload').val()
-			},
-			dataType: 'json',
-			global: false,
-			error: function(request, status, error) {
-				handleAjaxError(request, status, error);
-			},
-			success: function(data) {
-				if (data.state != 'ok') {
-					$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
-					return;
-				}
-				if (!$.isEmptyObject(data.result)){
-					for(var pixelId in data.result){
-						$('[data-pixel="'+ pixelId.toString() +'"]').css('color', data.result[pixelId]);
-					}
-				}
-				$('.nameDottiScreen').val($('.memoryload').find('option:selected').text());
-				modifyWithoutSave=false;
-			}
-		});
+		getImageCode();
+		loadImage();
 	});
 
 	$('#bt_delImage').on('click', function () {
@@ -346,9 +346,11 @@ while ($i < 65) {
 							success: function(data) {
 								if (data.state != 'ok') {
 									$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
+									setTimeout(function() { deleteAlert() }, 2000);
 									return;
 								}
 								$('.eventDisplay').showAlert({message:  'Suppression effectuée' ,level: 'success'});
+								setTimeout(function() { deleteAlert() }, 2000);
 								loadMemoryList(id);
 								modifyWithoutSave=false;
 							}
@@ -363,20 +365,38 @@ while ($i < 65) {
 		var pixelId = $(this).attr('data-pixel');
 		var color = $('.pixelCircle').css('color');
 		if (erase == 1){
-			color ='#000000';
+			color ='rgb(0, 0, 0)';
 		}
 		if (pencil == 1){
 			$('.pixelCircle').css('color', $(this).css('color'));
 			$('.pixelcolor').val(hexc($(this).css('color')));
 			pencil = 0;
-			$('.eventDisplay').empty();
+			$('.eventDisplay').hideAlert();
+			$('.copycolor').css('color' , '');
+			return;
+		}
+		if (replace ==1){
+			var array ={};
+			var colortoreplace = $(this).css('color');
+			$('.pixel').each(function( index ) {
+				if ($(this).css('color') == colortoreplace ){
+					array[$(this).attr('data-pixel')] = hexc(color);
+					$(this).css('color', color);
+				}
+			});
+			replace = 0;
+			$('.eventDisplay').hideAlert();
+			$('.replacecolor').css('color' , '');
+			if ($('.realtime').is(':checked')){
+				sendPixelArray(array,id);
+			}
 			return;
 		}
 		$(this).css('color', color);
 		if ($('.realtime').is(':checked')){
 			var array = {};
-			array[pixelId.toString()] = color;
-			sendPixelArray(array,id);
+			array[pixelId.toString()] = hexc(color);
+			sendPixelArray(array,id,false);
 		}
 	})
 
@@ -392,6 +412,19 @@ while ($i < 65) {
 			var array = {};
 			$('.pixel').each(function( index ) {
 				array[$(this).attr('data-pixel')] = hexc($(this).css('color'));
+			});
+			sendPixelArray(array,id);
+		}
+	})
+	
+	$('#bt_fillblack').on('click', function() {
+		$('.pixel').each(function( index ) {
+			$(this).css('color', '#000000');
+		});
+		if ($('.realtime').is(':checked')){
+			var array = {};
+			$('.pixel').each(function( index ) {
+				array[$(this).attr('data-pixel')] = '#000000';
 			});
 			sendPixelArray(array,id);
 		}
@@ -416,7 +449,10 @@ while ($i < 65) {
 		return color;
 	}
 
-	function sendPixelArray(_array,_id) {
+	function sendPixelArray(_array,_id,_displaymess = true) {
+		if (_displaymess){
+			$('.eventDisplay').showAlert({message:  'Affichage sur le Dotti en cours ...' ,level: 'warning'});
+		}
 		$.ajax({
 			type: "POST",
 			url: "plugins/dotti/core/ajax/dotti.ajax.php",
@@ -433,11 +469,20 @@ while ($i < 65) {
 			success: function(data) {
 				if (data.state != 'ok') {
 					$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
+					setTimeout(function() { deleteAlert() }, 2000);
 					return;
+				}
+				if (_displaymess){
+					setTimeout(function() { $('.eventDisplay').showAlert({message:  'Affichage effectué' ,level: 'success'}); }, 2000);
+					setTimeout(function() { deleteAlert() }, 4000);
 				}
 				modifyWithoutSave=false;
 			}
 		});
+	}
+	
+	function deleteAlert() {
+		$('.eventDisplay').hideAlert();
 	}
 
 	function loadMemoryList(_id) {
@@ -455,6 +500,7 @@ while ($i < 65) {
 			success: function(data) {
 				if (data.state != 'ok') {
 					$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
+					setTimeout(function() { deleteAlert() }, 2000);
 					return;
 				}
 				modifyWithoutSave=false;
@@ -463,6 +509,64 @@ while ($i < 65) {
 				} else {
 					$('.memoryload').empty();
 				}
+			}
+		});
+	}
+	function loadImage(){
+		$.ajax({
+			type: "POST",
+			url: "plugins/dotti/core/ajax/dotti.ajax.php",
+			data: {
+				action: "loadImage",
+				id: id,
+				name: $('.memoryload').val()
+			},
+			dataType: 'json',
+			global: false,
+			error: function(request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+			success: function(data) {
+				if (data.state != 'ok') {
+					$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
+					setTimeout(function() { deleteAlert() }, 2000);
+					return;
+				}
+				if (!$.isEmptyObject(data.result)){
+					for(var pixelId in data.result){
+						$('[data-pixel="'+ pixelId.toString() +'"]').css('color', data.result[pixelId]);
+					}
+				}
+				$('.nameDottiScreen').val($('.memoryload').find('option:selected').text());
+				modifyWithoutSave=false;
+			}
+		});
+	}
+	
+	function getImageCode(){
+		$('.imageDotti').val('');
+		$.ajax({
+			type: "POST",
+			url: "plugins/dotti/core/ajax/dotti.ajax.php",
+			data: {
+				action: "getImageCode",
+				name: $('.memoryload').val()
+			},
+			dataType: 'json',
+			global: false,
+			error: function(request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+			success: function(data) {
+				if (data.state != 'ok') {
+					$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
+					setTimeout(function() { deleteAlert()}, 2000);
+					return;
+				}
+				$('.imageDotti').off('change');
+				$('.imageDotti').val(data.result);
+				autoLoadJson();
+				modifyWithoutSave=false;
 			}
 		});
 	}

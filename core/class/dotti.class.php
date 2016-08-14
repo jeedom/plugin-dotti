@@ -283,7 +283,10 @@ class dotti extends eqLogic {
 
 	public static function saveImage($_id, $_name, $_data, $_isjson = false) {
 		$dotti = dotti::byId($_id);
-		dotti::sendDataRealTime($_data, $_id);
+		try{
+			dotti::sendDataRealTime($_data, $_id);
+		} catch(Exception $e){
+		}
 		sleep(5);
 		$directory= dirname(__FILE__) . '/../../data/';
 		if (!is_dir($directory)) {
