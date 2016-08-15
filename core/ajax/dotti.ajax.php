@@ -26,8 +26,13 @@ try {
 	
 	if (init('action') == 'loadImage') {
 		$name = init('name');
-		$id = init('id');
-		ajax::success(dotti::loadImage($name,$id));
+		ajax::success(dotti::loadImage($name));
+	}
+	
+	if (init('action') == 'renameImage') {
+		$oriname = init('oriname');
+		$newname = init('newname');
+		ajax::success(dotti::renameImage($oriname,$newname));
 	}
 	
 	if (init('action') == 'saveImage') {

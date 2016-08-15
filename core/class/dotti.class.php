@@ -210,8 +210,7 @@ class dotti extends eqLogic {
 		$dotti->sendData('display', $data);
 	}
 
-	public static function loadImage($_name, $_id) {
-		$dotti = dotti::byId($_id);
+	public static function loadImage($_name) {
 		$file = dirname(__FILE__) . '/../../data/collection.json';
 		$dataColor = array();
 		if (file_exists($file)) {
@@ -221,6 +220,25 @@ class dotti extends eqLogic {
 			}
 		}
 		return $dataColor;
+	}
+	
+	public static function renameImage($_oriname,$_newname) {
+		$file = dirname(__FILE__) . '/../../data/collection.json';
+		if (file_exists($file)) {
+			$dataMemory = json_decode(file_get_contents($file), true);
+			if (isset($dataMemory[$_oriname])) {
+				$oldData = $dataMemory[$_oriname];
+				unset($dataMemory[$_oriname]);
+				$dataMemory[strtolower($_newname)] = $oldData;
+			}
+		}
+		ksort($dataMemory);
+		if (file_exists($file)) {
+			shell_exec('sudo rm ' . $file);
+		}
+		file_put_contents($file, json_encode($dataMemory, JSON_FORCE_OBJECT));
+		dotti::refreshTitles();
+		return;
 	}
 
 	public static function getImageCode($_name) {

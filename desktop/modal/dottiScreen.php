@@ -107,7 +107,7 @@ while ($i < 65) {
 	</div>
 </div>
 <script>
-	loadMemoryList(id);
+	loadMemoryList();
 	setTimeout(function() { loadImage()}, 200);
 	var pencil = 0;
 	var erase = 0;
@@ -258,7 +258,7 @@ while ($i < 65) {
 								$('.eventDisplay').showAlert({message:  'Sauvegarde effectuée' ,level: 'success'});
 								setTimeout(function() { deleteAlert() }, 2000);
 								modifyWithoutSave=false;
-								loadMemoryList(id);
+								loadMemoryList();
 							}
 						});
 					}
@@ -309,7 +309,7 @@ while ($i < 65) {
 								}
 								$('.eventDisplay').showAlert({message:  'Suppression effectuée' ,level: 'success'});
 								setTimeout(function() { deleteAlert() }, 2000);
-								loadMemoryList(id);
+								loadMemoryList();
 								modifyWithoutSave=false;
 							}
 						});
@@ -447,7 +447,7 @@ while ($i < 65) {
 		$('.eventDisplay').hideAlert();
 	}
 
-	function loadMemoryList(_id) {
+	function loadMemoryList() {
 		$.ajax({
 			type: "POST",
 			url: "plugins/dotti/core/ajax/dotti.ajax.php",
@@ -481,7 +481,6 @@ while ($i < 65) {
 			url: "plugins/dotti/core/ajax/dotti.ajax.php",
 			data: {
 				action: "loadImage",
-				id: id,
 				name: $('.memoryload').val()
 			},
 			dataType: 'json',
