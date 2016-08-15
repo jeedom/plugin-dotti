@@ -247,6 +247,7 @@ class dotti extends eqLogic {
 			shell_exec('sudo rm ' . $file);
 		}
 		file_put_contents($file, json_encode($dataMemory, JSON_FORCE_OBJECT));
+		dotti::refreshTitles();
 		return;
 	}
 
@@ -305,6 +306,17 @@ class dotti extends eqLogic {
 		if (file_exists($file)) {
 			shell_exec('sudo rm ' . $file);
 		}
+		file_put_contents($file, json_encode($dataMemory, JSON_FORCE_OBJECT));
+		dotti::refreshTitles();
+	}
+
+	public static function refreshTitles(){
+		$file = dirname(__FILE__) . '/../../data/collection.json';
+		$dataMemory = array();
+		if (file_exists($file)) {
+			$dataMemory = json_decode(file_get_contents($file), true);
+		}
+		ksort($dataMemory);
 		$array = array();
 		foreach ($dataMemory as $name => $data) {
 			$array[] = $name;
@@ -314,9 +326,7 @@ class dotti extends eqLogic {
 			$cmd->setDisplay('title_possibility_list', json_encode($array));
 			$cmd->save();
 		}
-		file_put_contents($file, json_encode($dataMemory, JSON_FORCE_OBJECT));
 	}
-
 	/*     * *********************Méthodes d'instance************************* */
 	public function preSave() {
 		$this->setCategory('multimedia', 1);
@@ -415,6 +425,8 @@ class dotti extends eqLogic {
 		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
 		$cmd->setDisplay('message_placeholder', __('Données brute', __FILE__));
 		$cmd->save();
+		
+		dotti::refreshTitles();
 	}
 
 	public function sendData($_type, $_data) {
