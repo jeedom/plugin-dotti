@@ -187,7 +187,7 @@ while ($i < 65) {
 
 	function autoLoadJson(){
 		try {
-			data = json_decode($(this).value());
+			data = json_decode($('.imageDotti').val());
 			for(var pixelId in data){
 				$('[data-pixel="'+ pixelId +'"]').css('color', data[pixelId]);
 			}
