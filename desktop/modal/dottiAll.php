@@ -190,7 +190,7 @@ $('.bt_delImageMini').on('click', function () {
 		$('.eventDisplayMini').hideAlert();
 	}
 	
-	$('#md_modal').on('dialogclose', function () {
+	$('#md_modal2').on('dialogclose', function () {
 		loadMemoryList();
    });
 </script>
