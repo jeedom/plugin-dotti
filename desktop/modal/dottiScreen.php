@@ -101,7 +101,7 @@ while ($i < 65) {
 		</div>
 		<div class="form-group">
 			<textarea class="imageDotti form-control" style="display:none" rows="20"></textarea></br>
-			<a class="btn btn-success uploadimageDotti" id="bt_upload" style="display:none"><i class="fa fa-upload"></i>  {{Envoyer}}</a>
+			<a class="btn btn-success uploadimageDotti" id="bt_upload" style="display:none"><i class="fa fa-check"></i></a>
 			<a class="btn btn-danger closeimageDotti" id="bt_close" style="display:none"><i class="fa fa-times"></i></a>
 		</div>
 	</div>
@@ -209,60 +209,6 @@ while ($i < 65) {
 		$('.imageDotti').hide();
 		$('.closeimageDotti').hide();
 		$('.uploadimageDotti').hide();
-	});
-
-	$('#bt_upload').on('click', function () {
-		if ($('.nameDottiScreen').val() == ''){
-			$('.eventDisplay').showAlert({message:  'Vous devez spécifier un nom pour sauver une image',level: 'danger'});
-			return;
-		}
-		bootbox.dialog({
-			title: 'Etes-vous sur ?',
-			message: 'Vous allez sauver l\'image avec le nom "' +$('.nameDottiScreen').val() +'" ! Voulez-vous continuer ?',
-			buttons: {
-				"{{Annuler}}": {
-					className: "btn-danger",
-					callback: function () {
-					}
-				},
-				success: {
-					label: "{{Continuer}}",
-					className: "btn-success",
-					callback: function () {
-						$('.eventDisplay').showAlert({message:  'Affichage sur le Dotti en cours ...',level: 'warning'});
-						$.ajax({
-							type: "POST",
-							url: "plugins/dotti/core/ajax/dotti.ajax.php",
-							data: {
-								action: "saveImagejson",
-								id: id,
-								name: $('.nameDottiScreen').val(),
-								data : $('.imageDotti').val()
-							},
-							global : false,
-							dataType: 'json',
-							error: function(request, status, error) {
-								handleAjaxError(request, status, error);
-							},
-							success: function(data) {
-								if (data.state != 'ok') {
-									$('.eventDisplay').showAlert({message:  data.result,level: 'danger'});
-									setTimeout(function() { deleteAlert()}, 2000);
-									return;
-								}
-								$('.eventDisplay').showAlert({message:  'Sauvegarde effectuée' ,level: 'success'});
-								setTimeout(function() { deleteAlert()}, 2000);
-								modifyWithoutSave=false;
-								loadMemoryList(id);
-								$('.imageDotti').hide();
-								$('.closeimageDotti').hide();
-								$('.uploadimageDotti').hide();
-							}
-						});
-					}
-				},
-			}
-		});
 	});
 	
 	$('#bt_saveImage').on('click', function () {
