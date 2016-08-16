@@ -479,6 +479,10 @@ class dotti extends eqLogic {
 	}
 
 	public function sendData($_type, $_data, $_priority = 100, $_timeout = null) {
+		$cron = cron::byClassAndFunction('dotti', 'displayTimeout');
+		if (is_object($cron)) {
+			$cron->remove();
+		}
 		if ($_priority == -1) {
 			$this->setCache('priority', 0);
 			$_priority = 0;
