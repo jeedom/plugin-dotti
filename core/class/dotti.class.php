@@ -348,7 +348,7 @@ class dotti extends eqLogic {
 
 	public static function displayTimeout($_params) {
 		$eqLogic = eqLogic::byId($_params['dotti_id']);
-		$eqLogic->sendData('display', $eqLogic->getCache('previousDisplay'));
+		$eqLogic->sendData('display', $eqLogic->getCache('previousDisplay'), -1);
 	}
 	/*     * *********************Méthodes d'instance************************* */
 	public function preSave() {
