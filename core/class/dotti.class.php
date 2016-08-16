@@ -221,8 +221,8 @@ class dotti extends eqLogic {
 		}
 		return $dataColor;
 	}
-	
-	public static function renameImage($_oriname,$_newname) {
+
+	public static function renameImage($_oriname, $_newname) {
 		$file = dirname(__FILE__) . '/../../data/collection.json';
 		if (file_exists($file)) {
 			$dataMemory = json_decode(file_get_contents($file), true);
@@ -328,7 +328,7 @@ class dotti extends eqLogic {
 		dotti::refreshTitles();
 	}
 
-	public static function refreshTitles(){
+	public static function refreshTitles() {
 		$file = dirname(__FILE__) . '/../../data/collection.json';
 		$dataMemory = array();
 		if (file_exists($file)) {
@@ -443,11 +443,11 @@ class dotti extends eqLogic {
 		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
 		$cmd->setDisplay('message_placeholder', __('Données brute', __FILE__));
 		$cmd->save();
-		
+
 		dotti::refreshTitles();
 	}
 
-	public function sendData($_type, $_data) {
+	public function sendData($_type, $_data, $_priority = 100) {
 		if ($_type == 'display') {
 			if (isset($_data[0]) && is_array($_data[0])) {
 				$data = array();
@@ -509,7 +509,10 @@ class dottiCmd extends cmd {
 			if (!isset($options['color'])) {
 				$options['color'] = 'FFFFFF';
 			}
-			$eqLogic->sendData('display', dotti::text2array($_options['message'], $options['color']));
+			if (!isset($options['priority'])) {
+				$options['priority'] = 100;
+			}
+			$eqLogic->sendData('display', dotti::text2array($_options['message'], $options['color']), $options['priority']);
 			return;
 		}
 		if ($this->getLogicalId() == 'blackscreen') {
@@ -520,16 +523,20 @@ class dottiCmd extends cmd {
 			if (!is_numeric($_options['message'])) {
 				throw new Exception(__('Le champs message doit être un numérique : ', __FILE__) . $_options['message']);
 			}
+			$options = array();
 			$line = 1;
 			if (is_numeric($_options['title'])) {
-				$line = $_options['title'];
+				$options['line'] = $_options['title'];
 			} else {
 				$options = arg2array($_options['title']);
-				if (!isset($options['line'])) {
-					$line = $options['line'];
-				}
 			}
-			$eqLogic->sendData('display', dotti::number2line($_options['message'], $line));
+			if (!isset($options['line'])) {
+				$options['line'] = 1;
+			}
+			if (!isset($options['priority'])) {
+				$options['priority'] = 100;
+			}
+			$eqLogic->sendData('display', dotti::number2line($_options['message'], $options['line']), $options['priority']);
 			return;
 		}
 		if ($this->getLogicalId() == 'sendraw') {
@@ -542,7 +549,11 @@ class dottiCmd extends cmd {
 			return;
 		}
 		if ($this->getLogicalId() == 'loadimage') {
-			$eqLogic->sendData('display', dotti::getImageData($_options['title']));
+			$options = arg2array($_options['title']);
+			if (!isset($options['priority'])) {
+				$options['priority'] = 100;
+			}
+			$eqLogic->sendData('display', dotti::getImageData($_options['title']), $options['priority']);
 			return;
 		}
 		if ($this->getLogicalId() == 'sendcolor') {
@@ -562,7 +573,11 @@ class dottiCmd extends cmd {
 			} else {
 				$arrayicon = explode(';', $_options['message']);
 			}
-			$eqLogic->sendData('display', dotti::getImageData($arrayicon[array_rand($arrayicon)]));
+			$options = arg2array($_options['title']);
+			if (!isset($options['priority'])) {
+				$options['priority'] = 100;
+			}
+			$eqLogic->sendData('display', dotti::getImageData($arrayicon[array_rand($arrayicon)]), $options['priority']);
 			return;
 		}
 	}
