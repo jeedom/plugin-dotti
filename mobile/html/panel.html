@@ -1,0 +1,41 @@
+<div class="row">
+	
+</div>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="form-group">
+			<div class="eventDisplay"></div>
+		</div>
+		<div class="form-group pixelTrame">
+		</div>
+		<div class="form-group">
+		<center>
+			<label class="fa fa-circle pixelCircle" style="color : #000000;font-size:2em; cursor: pointer;"><div style="width:0;height:0;visibility:hidden"><input class="pixelcolor" type="color" value="#000000" style="width:0;height:0;visibility:hidden"></div></label>
+			<a class="ui-btn ui-mini ui-btn-inline ui-btn-b btn-success" id="bt_fill"><i class="fa fa-tint"></i></a>
+			<a class="ui-btn ui-mini ui-btn-inline ui-btn-b btn-danger" id="bt_fillblack"><i class="fa fa-times"></i></a>
+			<a class="ui-btn ui-mini ui-btn-inline ui-btn-b btn-warning replacecolor" id="bt_replace"><i class="fa fa-flask"></i></a>
+			<a class="ui-btn ui-mini ui-btn-inline ui-btn-b btn-success copycolor" id="bt_copyColor"><i class="fa fa-pencil"></i></a>
+			<a class="ui-btn ui-mini ui-btn-inline ui-btn-b btn-danger erasecolor" id="bt_erase"><i class="fa fa-eraser"></i></a>
+			<a class="ui-btn ui-mini ui-btn-inline ui-btn-b btn-warning" id="bt_sendAll"><i class="fa fa-paint-brush"></i></a>
+			<a class="ui-btn ui-mini ui-btn-inline ui-btn-b realtime"><i class="fa fa-spinner"></i></a>
+		</center>	
+		</div>
+	</div>
+	
+	<div class="col-xs-12">
+		<div class="form-group">
+			
+		</div>
+		<div class="form-group">
+				<div style="width:90%"><select class="memoryload"></select></div>
+				<a class="ui-btn ui-mini ui-btn-inline ui-btn-b btn-danger pull-right" style="margin-top:-3.6em" id="bt_delImage"><i class="fa fa-trash-o"></i></a>
+				<div style="width:98%"><input class="nameDottiScreen form-control" id="texte" type='text'/></div>
+				<a class="ui-btn ui-mini ui-btn-inline ui-btn-b btn-success pull-right" style="margin-top:-3.6em" id="bt_saveImage"><i class="fa fa-floppy-o"></i></a>				
+				
+		</div>
+</div>
+
+<script>
+	$.include(['plugins/dotti/mobile/js/panel.js'], function () {
+	});
+</script>

@@ -37,6 +37,10 @@ try {
 	
 	if (init('action') == 'saveImage') {
 		$id = init('id');
+		if ($id ==''){
+			$id = eqLogic::byType('dotti')[0]->getId();
+		}
+		log::add('dotti','debug',print_r(eqLogic::byType('dotti'),true));
 		$name = init('name');
 		$data = init('data');
 		if ($name == ''){
@@ -69,6 +73,9 @@ try {
 	if (init('action') == 'sendPixelArray') {
 		$array = init('array');
 		$id = init('id');
+		if ($id ==''){
+			$id = eqLogic::byType('dotti')[0]->getId();
+		}
 		ajax::success(dotti::sendDataRealTime($array,$id));
 	}
 	

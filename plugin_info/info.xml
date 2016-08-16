@@ -8,8 +8,9 @@
     <author>Ludovic Sarakha et Loïc Gevrey</author>
     <installation>Aucune</installation>
     <require>2.4</require>
-    <category>communication</category>
+    <category>devicecommunication</category>
     <hasOwnDeamon>1</hasOwnDeamon>
+    <mobile>panel</mobile>
     <hasDependency>1</hasDependency>
 </info>
 
