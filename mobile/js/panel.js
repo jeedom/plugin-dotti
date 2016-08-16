@@ -2,12 +2,11 @@ function initDottiPanel(){
 	loadMemoryList();
 	loadTrame();
 	setTimeout(function() { loadImage()}, 200);
-	var pencil = 0;
-	var id = '';
-	var erase = 0;
-	var replace = 0;
-	var realtime = 0;
-}
+	pencil = 0;
+	id = '';
+	erase = 0;
+	replace = 0;
+	realtime = 0;
 	$('.realimage').on('change', function () {
 		if ($(this).is(':checked')){
 			$('.pixelNotFirstLine').css('margin-top' , '-17px');
@@ -234,6 +233,8 @@ function initDottiPanel(){
 	$('#bt_sendAll').on('click', function() {
 		sendAll();
 	});
+}
+	
 	
 	function sendAll() {
 		var array = {};
