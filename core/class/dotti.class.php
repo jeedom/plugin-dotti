@@ -345,6 +345,11 @@ class dotti extends eqLogic {
 			$cmd->save();
 		}
 	}
+
+	public static function displayTimeout($_params) {
+		$eqLogic = eqLogic::byId($_params['dotti_id']);
+		$eqLogic->sendData('display', $eqLogic->getCache('previousDisplay'));
+	}
 	/*     * *********************Méthodes d'instance************************* */
 	public function preSave() {
 		$this->setCategory('multimedia', 1);
@@ -459,9 +464,9 @@ class dotti extends eqLogic {
 		dotti::refreshTitles();
 	}
 
-	public function sendData($_type, $_data, $_priority = 100) {
+	public function sendData($_type, $_data, $_priority = 100, $_timeout = null) {
 		if ($_priority == -1) {
-			$this->seetCache('priority', 0);
+			$this->setCache('priority', 0);
 			$_priority = 0;
 		}
 		if ($_type == 'display') {
@@ -479,7 +484,26 @@ class dotti extends eqLogic {
 				}
 				$_data = $data;
 			}
-			$this->seetCache('priority', $_priority);
+			$this->setCache('priority', $_priority);
+			if ($_data != $this->getCache('display', array())) {
+				if ($this->getCache('previousDisplay', array()) != $this->getCache('display', array())) {
+					$this->setCache('previousDisplay', $this->getCache('display', array()));
+				}
+				$this->setCache('display', $_data);
+			}
+			if ($_timeout !== null) {
+				if ($_timeout < 1) {
+					$_timeout = 1;
+				}
+				$cron = new cron();
+				$cron->setClass('dotti');
+				$cron->setFunction('displayTimeout');
+				$cron->setOption(array('dotti_id' => intval($this->getId())));
+				$cron->setLastRun(date('Y-m-d H:i:s'));
+				$cron->setOnce(1);
+				$cron->setSchedule(cron::convertDateToCron(strtotime() + $_timeout));
+				$cron->save();
+			}
 		}
 		$value = json_encode(array('apikey' => config::byKey('api'), 'type' => $_type, 'data' => $_data, 'mac' => $this->getConfiguration('mac')), JSON_FORCE_OBJECT);
 		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
@@ -532,7 +556,10 @@ class dottiCmd extends cmd {
 			if (!isset($options['priority'])) {
 				$options['priority'] = 100;
 			}
-			$eqLogic->sendData('display', dotti::text2array($_options['message'], $options['color']), $options['priority']);
+			if (!isset($options['timeout'])) {
+				$options['timeout'] = null;
+			}
+			$eqLogic->sendData('display', dotti::text2array($_options['message'], $options['color']), $options['priority'], $options['timeout']);
 			return;
 		}
 		if ($this->getLogicalId() == 'blackscreen') {
@@ -556,7 +583,10 @@ class dottiCmd extends cmd {
 			if (!isset($options['priority'])) {
 				$options['priority'] = 100;
 			}
-			$eqLogic->sendData('display', dotti::number2line($_options['message'], $options['line']), $options['priority']);
+			if (!isset($options['timeout'])) {
+				$options['timeout'] = null;
+			}
+			$eqLogic->sendData('display', dotti::number2line($_options['message'], $options['line']), $options['priority'], $options['timeout']);
 			return;
 		}
 		if ($this->getLogicalId() == 'sendraw') {
@@ -573,7 +603,10 @@ class dottiCmd extends cmd {
 			if (!isset($options['priority'])) {
 				$options['priority'] = 100;
 			}
-			$eqLogic->sendData('display', dotti::getImageData($_options['title']), $options['priority']);
+			if (!isset($options['timeout'])) {
+				$options['timeout'] = null;
+			}
+			$eqLogic->sendData('display', dotti::getImageData($_options['title']), $options['priority'], $options['timeout']);
 			return;
 		}
 		if ($this->getLogicalId() == 'sendcolor') {
@@ -597,7 +630,10 @@ class dottiCmd extends cmd {
 			if (!isset($options['priority'])) {
 				$options['priority'] = 100;
 			}
-			$eqLogic->sendData('display', dotti::getImageData($arrayicon[array_rand($arrayicon)]), $options['priority']);
+			if (!isset($options['timeout'])) {
+				$options['timeout'] = null;
+			}
+			$eqLogic->sendData('display', dotti::getImageData($arrayicon[array_rand($arrayicon)]), $options['priority'], $options['timeout']);
 			return;
 		}
 		if ($this->getLogicalId() == 'resetpriority') {
