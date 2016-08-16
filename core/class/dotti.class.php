@@ -515,7 +515,7 @@ class dotti extends eqLogic {
 				$cron->setOption(array('dotti_id' => intval($this->getId())));
 				$cron->setLastRun(date('Y-m-d H:i:s'));
 				$cron->setOnce(1);
-				$cron->setSchedule(cron::convertDateToCron(strtotime("now") + $_timeout));
+				$cron->setSchedule(cron::convertDateToCron(strtotime("now") + $_timeout*60));
 				$cron->save();
 			}
 		}
