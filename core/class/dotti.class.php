@@ -372,7 +372,7 @@ class dotti extends eqLogic {
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('message');
-		$cmd->setDisplay('title_disable', 1);
+		$cmd->setDisplay('title_disable', 0);
 		$cmd->setDisplay('message_placeholder', __('Vide ou liste d\'icône sépraré par ;', __FILE__));
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
@@ -424,7 +424,7 @@ class dotti extends eqLogic {
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('message');
-		$cmd->setDisplay('message_disable', 1);
+		$cmd->setDisplay('message_disable', 0);
 		$cmd->setDisplay('title_disable', 0);
 		$cmd->setDisplay('title_placeholder', __('Nom', __FILE__));
 		$cmd->setEqLogic_id($this->getId());
@@ -444,11 +444,30 @@ class dotti extends eqLogic {
 		$cmd->setDisplay('message_placeholder', __('Données brute', __FILE__));
 		$cmd->save();
 
+		$cmd = $this->getCmd(null, 'resetpriority');
+		if (!is_object($cmd)) {
+			$cmd = new dottiCmd();
+			$cmd->setLogicalId('resetpriority');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Raz priorité', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('other');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+
 		dotti::refreshTitles();
 	}
 
 	public function sendData($_type, $_data, $_priority = 100) {
+		if ($_priority == -1) {
+			$this->seetCache('priority', 0);
+			$_priority = 0;
+		}
 		if ($_type == 'display') {
+			if ($this->getCache('priority', 0) > $_priority) {
+				return;
+			}
 			if (isset($_data[0]) && is_array($_data[0])) {
 				$data = array();
 				$i = 1;
@@ -460,6 +479,7 @@ class dotti extends eqLogic {
 				}
 				$_data = $data;
 			}
+			$this->seetCache('priority', $_priority);
 		}
 		$value = json_encode(array('apikey' => config::byKey('api'), 'type' => $_type, 'data' => $_data, 'mac' => $this->getConfiguration('mac')), JSON_FORCE_OBJECT);
 		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
@@ -549,7 +569,7 @@ class dottiCmd extends cmd {
 			return;
 		}
 		if ($this->getLogicalId() == 'loadimage') {
-			$options = arg2array($_options['title']);
+			$options = arg2array($_options['message']);
 			if (!isset($options['priority'])) {
 				$options['priority'] = 100;
 			}
@@ -578,6 +598,10 @@ class dottiCmd extends cmd {
 				$options['priority'] = 100;
 			}
 			$eqLogic->sendData('display', dotti::getImageData($arrayicon[array_rand($arrayicon)]), $options['priority']);
+			return;
+		}
+		if ($this->getLogicalId() == 'resetpriority') {
+			$eqLogic->setCache('priority', 0);
 			return;
 		}
 	}
