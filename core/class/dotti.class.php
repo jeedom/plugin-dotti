@@ -378,6 +378,7 @@ class dotti extends eqLogic {
 		$cmd->setType('action');
 		$cmd->setSubType('message');
 		$cmd->setDisplay('title_disable', 0);
+		$cmd->setDisplay('title_placeholder', __('Options', __FILE__));
 		$cmd->setDisplay('message_placeholder', __('Vide ou liste d\'icône sépraré par ;', __FILE__));
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
@@ -431,6 +432,7 @@ class dotti extends eqLogic {
 		$cmd->setSubType('message');
 		$cmd->setDisplay('message_disable', 0);
 		$cmd->setDisplay('title_disable', 0);
+		$cmd->setDisplay('message_placeholder', __('Options', __FILE__));
 		$cmd->setDisplay('title_placeholder', __('Nom', __FILE__));
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
@@ -455,6 +457,18 @@ class dotti extends eqLogic {
 			$cmd->setLogicalId('resetpriority');
 			$cmd->setIsVisible(1);
 			$cmd->setName(__('Raz priorité', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('other');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+		
+		$cmd = $this->getCmd(null, 'lastimage');
+		if (!is_object($cmd)) {
+			$cmd = new dottiCmd();
+			$cmd->setLogicalId('lastimage');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Image précédente', __FILE__));
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('other');
@@ -611,6 +625,10 @@ class dottiCmd extends cmd {
 		}
 		if ($this->getLogicalId() == 'sendcolor') {
 			$eqLogic->sendData('color', hex2rgb($_options['color']));
+			return;
+		}
+		if ($this->getLogicalId() == 'lastimage') {
+			$eqLogic->sendData('display', $eqLogic->getCache('previousDisplay'), -1);
 			return;
 		}
 		if ($this->getLogicalId() == 'sendrandom') {
