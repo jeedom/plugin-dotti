@@ -39,7 +39,7 @@ class dotti extends eqLogic {
 
 	public static function dependancy_install() {
 		log::remove('dotti_update');
-		$cmd = 'sudo /bin/bash ' . dirname(__FILE__) . '/../../ressources/install.sh';
+		$cmd = 'sudo /bin/bash ' . dirname(__FILE__) . '/../../resources/install.sh';
 		$cmd .= ' >> ' . log::getPathToLog('dotti_update') . ' 2>&1 &';
 		exec($cmd);
 	}
