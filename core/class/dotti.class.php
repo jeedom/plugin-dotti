@@ -634,17 +634,47 @@ class dottiCmd extends cmd {
 			return;
 		}
 		if ($this->getLogicalId() == 'sendrandom') {
-			if ($_options['message'] == '') {
-				$file = dirname(__FILE__) . '/../../data/collection.json';
-				$dataMemory = array();
-				if (file_exists($file)) {
-					$dataMemory = json_decode(file_get_contents($file), true);
+			$arrayicon = array();
+			$arraycheck = array();
+			$file = dirname(__FILE__) . '/../../data/collection.json';
+			$dataMemory = array();
+			if (file_exists($file)) {
+				$dataMemory = json_decode(file_get_contents($file), true);
+			}
+			foreach ($dataMemory as $name => $data) {
+				$arraycheck[] = $name;
+			}
+			$arrayadd = array();
+			$arraydel = array();
+			if ($_options['message'] != '') {	
+				$arrayName = explode(';', $_options['message']);		
+				foreach ($arrayName as $name) {
+					if (substr($name,0,1)== '-'){
+						$arraydel[]=strtolower(substr($name,1));
+					} else {
+						$arrayadd[]=strtolower($name);
+					}
 				}
-				foreach ($dataMemory as $name => $data) {
-					$arrayicon[] = $name;
+				$i=0;
+				foreach ($arraycheck as $icon) {
+					if (count($arrayadd >0)) {
+						foreach ($arrayadd as $add){
+							if (strpos($icon,$add) !== false){
+								$arrayicon[]=$icon;
+							}
+						}
+					}
+					if (count($arraydel >0)) {
+						foreach ($arraydel as $del){
+							if (strpos($icon,$del)=== false){
+								$arrayicon[]=$icon;
+							}
+						}
+					}
+					$i++;
 				}
 			} else {
-				$arrayicon = explode(';', $_options['message']);
+				$arrayicon = $arraycheck;
 			}
 			$options = arg2array($_options['title']);
 			if (!isset($options['priority'])) {
