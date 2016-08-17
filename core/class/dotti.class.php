@@ -510,8 +510,8 @@ class dotti extends eqLogic {
 				$this->setCache('display', $_data);
 			}
 			if ($_timeout !== null) {
-				if ($_timeout < 1) {
-					$_timeout = 1;
+				if ($_timeout < 2) {
+					$_timeout = 2;
 				}
 				$cron = new cron();
 				$cron->setClass('dotti');
