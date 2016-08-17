@@ -646,28 +646,28 @@ class dottiCmd extends cmd {
 			}
 			$arrayadd = array();
 			$arraydel = array();
-			if ($_options['message'] != '') {	
-				$arrayName = explode(';', $_options['message']);		
+			if ($_options['message'] != '') {
+				$arrayName = explode(';', $_options['message']);
 				foreach ($arrayName as $name) {
-					if (substr($name,0,1)== '-'){
-						$arraydel[]=strtolower(substr($name,1));
+					if (substr($name, 0, 1) == '-') {
+						$arraydel[] = strtolower(substr($name, 1));
 					} else {
-						$arrayadd[]=strtolower($name);
+						$arrayadd[] = strtolower($name);
 					}
 				}
-				$i=0;
+				$i = 0;
 				foreach ($arraycheck as $icon) {
-					if (count($arrayadd >0)) {
-						foreach ($arrayadd as $add){
-							if (strpos($icon,$add) !== false){
-								$arrayicon[]=$icon;
+					if (count($arrayadd > 0)) {
+						foreach ($arrayadd as $add) {
+							if (strpos($icon, $add) !== false) {
+								$arrayicon[] = $icon;
 							}
 						}
 					}
-					if (count($arraydel >0)) {
-						foreach ($arraydel as $del){
-							if (strpos($icon,$del)=== false){
-								$arrayicon[]=$icon;
+					if (count($arraydel > 0)) {
+						foreach ($arraydel as $del) {
+							if (strpos($icon, $del) === false) {
+								$arrayicon[] = $icon;
 							}
 						}
 					}
