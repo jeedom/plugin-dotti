@@ -462,7 +462,7 @@ class dotti extends eqLogic {
 		$cmd->setSubType('other');
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
-		
+
 		$cmd = $this->getCmd(null, 'lastimage');
 		if (!is_object($cmd)) {
 			$cmd = new dottiCmd();
@@ -519,7 +519,7 @@ class dotti extends eqLogic {
 				$cron->setOption(array('dotti_id' => intval($this->getId())));
 				$cron->setLastRun(date('Y-m-d H:i:s'));
 				$cron->setOnce(1);
-				$cron->setSchedule(cron::convertDateToCron(strtotime("now") + $_timeout*60));
+				$cron->setSchedule(cron::convertDateToCron(strtotime("now") + $_timeout * 60));
 				$cron->save();
 			}
 		}
@@ -549,9 +549,7 @@ class dotti extends eqLogic {
 				$replace['#loadimage#'] = str_replace(array("'", '+'), array("\'", '\+'), $cmd->getDisplay('title_possibility_list'));
 			}
 		}
-		$html = template_replace($replace, getTemplate('core', $version, 'eqLogic', 'dotti'));
-		cache::set('widgetHtml' . $version . $this->getId(), $html, 0);
-		return $html;
+		return $this->postToHtml($_version, template_replace($replace, getTemplate('core', $version, 'eqLogic', 'dotti')));
 	}
 
 	/*     * **********************Getteur Setteur*************************** */
