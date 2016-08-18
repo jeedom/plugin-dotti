@@ -49,7 +49,7 @@ def connect(mac=None):
 	if mac not in DOTTIS:
 		DOTTIS[mac] = {}
 		DOTTIS[mac]['connection'] = None
-		
+	DOTTIS[mac]['display'] = {}
 	i=0
 	while True:
 		i = i + 1
@@ -177,10 +177,7 @@ def loadid(mac=None,loadid=None):
 		return
 	logging.debug('Load id '+str(saveid)+' into '+str(mac))
 	write(mac,struct.pack('<BBBBBB', 0x06, 0x08, 0x02,int(loadid),0x00,0x00))
-	if 'display' not in DOTTIS[mac]:
-		DOTTIS[mac]['display'] = {}
-	for i in range(64): 
-		DOTTIS[mac]['display'][i] = False
+	DOTTIS[mac]['display'] = {}
 
 def saveid(mac=None,saveid=None):
 	global DOTTIS
