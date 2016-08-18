@@ -58,10 +58,11 @@ def connect(mac=None):
 			DOTTIS[mac]['connection'] = btle.Peripheral(mac,iface=_device)
 			break
 		except Exception as err:
-			if i > maxRetry :
+			if i >= maxRetry :
 				logging.error('Connection error on '+ str(mac) +' => '+str(err))
 				return
-			time.sleep(1)
+			logging.debug("Wait " + str(i)+" second before retry")	
+			time.sleep(i)
 
 	logging.debug("Connection successfull on " + str(mac))		
 	DOTTIS[mac]['characteristic'] = btle.Characteristic(DOTTIS[mac]['connection'], btle.UUID('fff3'), 0x29, 8, 0x2A)
@@ -73,7 +74,7 @@ def disconnect(mac=None):
 		try:
 			DOTTIS[mac]['connection'].disconnect()
 			DOTTIS[mac]['connection'] = None
-			logging.error('Disconnection successfull')
+			logging.debug('Disconnection successfull')
 		except Exception as err:
 			logging.error('Disconnection error on '+ str(mac)+' => '+str(err))
 
@@ -105,27 +106,81 @@ def write(mac=None,message=None):
 # ----------------------------------------------------------------------------
 
 def display(mac=None,data=None):
+	global DOTTIS
 	if mac is None or data is None:
 		logging.error('[display] mac and data arg can not be null')
 		return
 	logging.debug('Write display into '+str(mac))
+	save_pixel=0
+	total_pixel=0
+	if 'display' not in DOTTIS[mac]:
+		DOTTIS[mac]['display'] = {}
+
+	temp={}
+	maxint=0
+	maxhex='#FFFFFF'
+	if len(data) == 64:
+		for pixel, value in data.iteritems():
+			shex = rgb_to_hex((int(value['0']), int(value['1']), int(value['2'])));
+			if shex not in temp:
+				temp[shex] = 1
+			else:
+				temp[shex] = temp[shex] + 1	
+			if temp[shex] > maxint:
+				maxint = temp[shex]
+				maxhex = shex
+		for pixel, value in data.iteritems():
+			total_pixel = total_pixel + 1
+			if int(pixel) in DOTTIS[mac]['display'] and DOTTIS[mac]['display'][int(pixel)] == rgb_to_hex((int(value['0']), int(value['1']), int(value['2']))):
+				save_pixel = save_pixel + 1
+
+		if  (maxint+1) > save_pixel and maxint > 2:
+			logging.debug('I use color all screen method to improve display speed')
+			color(mac,hex_to_rgb(maxhex))
+
+	save_pixel=0
+	total_pixel=0
 	for pixel, value in data.iteritems():
+		total_pixel = total_pixel + 1
+		if int(pixel) in DOTTIS[mac]['display'] and DOTTIS[mac]['display'][int(pixel)] == rgb_to_hex((int(value['0']), int(value['1']), int(value['2']))):
+			save_pixel = save_pixel + 1
+			continue
 		write(mac,struct.pack('<BBBBBB', 0x07, 0x02,int(pixel), int(value['0']), int(value['1']), int(value['2'])))
+		DOTTIS[mac]['display'][int(pixel)] = rgb_to_hex((int(value['0']), int(value['1']), int(value['2'])))
 		time.sleep(0.05)
+	logging.debug('I save '+str(save_pixel)+'/'+str(total_pixel)+' pixel to write so '+str((save_pixel*100)/total_pixel)+'%')
 
 def color(mac=None,data=None):
+	global DOTTIS
 	if mac is None or data is None:
 		logging.error('[color] mac and data arg can not be null')
 		return
 	logging.debug('Write color into '+str(mac))
-	write(mac,struct.pack('<BBBBBB', 0x06, 0x01, int(data['0']), int(data['1']), int(data['2']), 0x00))
+	if '0' in data:
+		write(mac,struct.pack('<BBBBBB', 0x06, 0x01, int(data['0']), int(data['1']), int(data['2']), 0x00))
+	if 0 in data:
+		write(mac,struct.pack('<BBBBBB', 0x06, 0x01, data[0], data[1], data[2], 0x00))
+	
+	if 'display' not in DOTTIS[mac]:
+		DOTTIS[mac]['display'] = {}
+
+	for i in range(64): 
+		if '0' in data:
+			DOTTIS[mac]['display'][int(i)] = rgb_to_hex((int(value['0']), int(value['1']), int(value['2'])))
+		if 0 in data:
+			DOTTIS[mac]['display'][int(i)] = rgb_to_hex((data[0], data[1], data[2]))
 
 def loadid(mac=None,loadid=None):
+	global DOTTIS
 	if mac is None or loadid is None:
 		logging.error('[loadid] mac and loadid arg can not be null')
 		return
 	logging.debug('Load id '+str(saveid)+' into '+str(mac))
 	write(mac,struct.pack('<BBBBBB', 0x06, 0x08, 0x02,int(loadid),0x00,0x00))
+	if 'display' not in DOTTIS[mac]:
+		DOTTIS[mac]['display'] = {}
+	for i in range(64): 
+		DOTTIS[mac]['display'][i] = False
 
 def saveid(mac=None,saveid=None):
 	global DOTTIS
@@ -176,6 +231,16 @@ def listen():
 			read_socket()
 	except KeyboardInterrupt:
 		shutdown()
+
+# ----------------------------------------------------------------------------
+
+def hex_to_rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
+def rgb_to_hex(rgb):
+    return '#%02x%02x%02x' % rgb
 
 # ----------------------------------------------------------------------------
 
