@@ -100,7 +100,6 @@ def write(mac=None,message=None):
 			connect(mac)
 			DOTTIS[mac]['characteristic'].write(message)
 		except Exception as err:
-			disconnect(mac)
 			logging.error('Write error on '+ str(mac)+' => '+str(err))
 
 # ----------------------------------------------------------------------------
