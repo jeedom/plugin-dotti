@@ -112,8 +112,6 @@ def display(mac=None,data=None):
 	logging.debug('Write display into '+str(mac))
 	save_pixel=0
 	total_pixel=0
-	if 'display' not in DOTTIS[mac]:
-		DOTTIS[mac]['display'] = {}
 
 	temp={}
 	maxint=0
@@ -134,7 +132,7 @@ def display(mac=None,data=None):
 				save_pixel = save_pixel + 1
 
 		if  (maxint+1) > save_pixel and maxint > 2:
-			logging.debug('I use color all screen method to improve display speed')
+			logging.debug('I use color all screen method to improve display speed in :'+str(maxhex))
 			color(mac,hex_to_rgb(maxhex))
 
 	save_pixel=0
@@ -159,9 +157,6 @@ def color(mac=None,data=None):
 		write(mac,struct.pack('<BBBBBB', 0x06, 0x01, int(data['0']), int(data['1']), int(data['2']), 0x00))
 	if 0 in data:
 		write(mac,struct.pack('<BBBBBB', 0x06, 0x01, data[0], data[1], data[2], 0x00))
-	
-	if 'display' not in DOTTIS[mac]:
-		DOTTIS[mac]['display'] = {}
 
 	for i in range(64): 
 		if '0' in data:
