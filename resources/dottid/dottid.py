@@ -155,13 +155,13 @@ def color(mac=None,data=None):
 	logging.debug('Write color into '+str(mac))
 	if '0' in data:
 		write(mac,struct.pack('<BBBBBB', 0x06, 0x01, int(data['0']), int(data['1']), int(data['2']), 0x00))
-	if 0 in data:
+	else:
 		write(mac,struct.pack('<BBBBBB', 0x06, 0x01, data[0], data[1], data[2], 0x00))
 
 	for i in range(64): 
 		if '0' in data:
 			DOTTIS[mac]['display'][int(i) + 1] = rgb_to_hex((int(value['0']), int(value['1']), int(value['2'])))
-		if 0 in data:
+		else:
 			DOTTIS[mac]['display'][int(i) + 1] = rgb_to_hex((data[0], data[1], data[2]))
 
 def loadid(mac=None,loadid=None):
