@@ -3,9 +3,8 @@
     <id>dotti</id>
     <name>Dotti</name>
     <description>Plugin pour piloter le Dotti</description>
-    <icon>fa fa-keyboard-o</icon>
     <licence>AGPL</licence>
-    <author>Ludovic Sarakha et Loïc Gevrey</author>
+    <author>Ludovic Sarakha et Loïc</author>
     <installation>Aucune</installation>
     <require>2.4</require>
     <category>devicecommunication</category>

@@ -1,0 +1,12 @@
+{
+	"id" : "dotti",
+	"name" : "Dotti",
+	"description" : "Plugin pour piloter le Dotti",
+	"licence" : "AGPL",
+	"author" : "Ludovic Sarakha et Loïc",
+	"require" : "2.4",
+	"category" : "devicecommunication",
+	"hasOwnDeamon" : true,
+	"hasDependency" : true,
+	"display" : "panel"
+}
