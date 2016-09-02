@@ -8,5 +8,5 @@
 	"category" : "devicecommunication",
 	"hasOwnDeamon" : true,
 	"hasDependency" : true,
-	"display" : "panel"
+	"mobile" : "panel"
 }
