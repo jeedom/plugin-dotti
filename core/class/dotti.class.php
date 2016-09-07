@@ -88,15 +88,9 @@ class dotti extends eqLogic {
 		if ($macs != '') {
 			$cmd .= ' --macs=' . trim($macs, ',');
 		}
-		if (config::byKey('jeeNetwork::mode') == 'slave') {
-			$cmd .= ' --sockethost=' . network::getNetworkAccess('internal', 'ip', '127.0.0.1');
-			$cmd .= ' --callback=' . config::byKey('jeeNetwork::master::ip') . '/plugins/dotti/core/php/jeeDotti.php';
-			$cmd .= ' --apikey=' . config::byKey('jeeNetwork::master::apikey');
-		} else {
-			$cmd .= ' --sockethost=127.0.0.1';
-			$cmd .= ' --callback=' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/dotti/core/php/jeeDotti.php';
-			$cmd .= ' --apikey=' . config::byKey('api');
-		}
+		$cmd .= ' --sockethost=127.0.0.1';
+		$cmd .= ' --callback=' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/dotti/core/php/jeeDotti.php';
+		$cmd .= ' --apikey=' . config::byKey('api');
 		log::add('dotti', 'info', 'Lancement démon dotti : ' . $cmd);
 		$result = exec($cmd . ' >> ' . log::getPathToLog('dotti') . ' 2>&1 &');
 		$i = 0;
