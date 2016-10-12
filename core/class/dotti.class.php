@@ -90,7 +90,7 @@ class dotti extends eqLogic {
 		}
 		$cmd .= ' --sockethost=127.0.0.1';
 		$cmd .= ' --callback=' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/dotti/core/php/jeeDotti.php';
-		$cmd .= ' --apikey=' . config::byKey('api');
+		$cmd .= ' --apikey=' . jeedom::getApiKey('dotti');
 		log::add('dotti', 'info', 'Lancement démon dotti : ' . $cmd);
 		$result = exec($cmd . ' >> ' . log::getPathToLog('dotti') . ' 2>&1 &');
 		$i = 0;
@@ -517,7 +517,7 @@ class dotti extends eqLogic {
 				$cron->save();
 			}
 		}
-		$value = json_encode(array('apikey' => config::byKey('api'), 'type' => $_type, 'data' => $_data, 'mac' => $this->getConfiguration('mac')), JSON_FORCE_OBJECT);
+		$value = json_encode(array('apikey' => jeedom::getApiKey('dotti'), 'type' => $_type, 'data' => $_data, 'mac' => $this->getConfiguration('mac')), JSON_FORCE_OBJECT);
 		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
 		socket_connect($socket, '127.0.0.1', config::byKey('socketport', 'dotti'));
 		socket_write($socket, $value, strlen($value));
