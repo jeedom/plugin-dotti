@@ -160,7 +160,7 @@ def color(mac=None,data=None):
 
 	for i in range(64): 
 		if '0' in data:
-			DOTTIS[mac]['display'][int(i) + 1] = rgb_to_hex((int(value['0']), int(value['1']), int(value['2'])))
+			DOTTIS[mac]['display'][int(i) + 1] = rgb_to_hex((int(data['0']), int(data['1']), int(data['2'])))
 		else:
 			DOTTIS[mac]['display'][int(i) + 1] = rgb_to_hex((data[0], data[1], data[2]))
 
