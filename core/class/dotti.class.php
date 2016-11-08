@@ -75,9 +75,9 @@ class dotti extends eqLogic {
 
 		$dotti_path = realpath(dirname(__FILE__) . '/../../resources/dottid');
 		$cmd = '/usr/bin/python ' . $dotti_path . '/dottid.py';
-		$cmd .= ' --device=' . str_replace('hci', '', $port);
-		$cmd .= ' --loglevel=' . log::convertLogLevel(log::getLogLevel('dotti'));
-		$cmd .= ' --socketport=' . config::byKey('socketport', 'dotti');
+		$cmd .= ' --device ' . str_replace('hci', '', $port);
+		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel('dotti'));
+		$cmd .= ' --socketport ' . config::byKey('socketport', 'dotti');
 		$macs = '';
 		foreach (self::byType('dotti') as $dotti) {
 			if ($dotti->getConfiguration('mac') == '') {
@@ -86,11 +86,9 @@ class dotti extends eqLogic {
 			$macs .= $dotti->getConfiguration('mac') . ',';
 		}
 		if ($macs != '') {
-			$cmd .= ' --macs=' . trim($macs, ',');
+			$cmd .= ' --macs ' . trim($macs, ',');
 		}
-		$cmd .= ' --sockethost=127.0.0.1';
-		$cmd .= ' --callback=' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/dotti/core/php/jeeDotti.php';
-		$cmd .= ' --apikey=' . jeedom::getApiKey('dotti');
+		$cmd .= ' --apikey ' . jeedom::getApiKey('dotti');
 		log::add('dotti', 'info', 'Lancement démon dotti : ' . $cmd);
 		$result = exec($cmd . ' >> ' . log::getPathToLog('dotti') . ' 2>&1 &');
 		$i = 0;

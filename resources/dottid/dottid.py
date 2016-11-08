@@ -19,6 +19,7 @@ import sys
 import os
 import time
 import datetime
+import argparse
 import re
 import signal
 from optparse import OptionParser
@@ -264,28 +265,32 @@ def shutdown():
 
 _log_level = "error"
 _socket_port = 55009
-_socket_host = 'localhost'
+_socket_host = '127.0.0.1'
 _device = 'auto'
 _pidfile = '/tmp/dottid.pid'
 _apikey = ''
 _macs = ''
 _device = 0
 
-for arg in sys.argv:
-	if arg.startswith("--loglevel="):
-		temp, _log_level = arg.split("=")
-	elif arg.startswith("--socketport="):
-		temp, _socket_port = arg.split("=")
-	elif arg.startswith("--macs="):
-		temp, _macs = arg.split("=")
-	elif arg.startswith("--pidfile="):
-		temp, _pidfile = arg.split("=")
-	elif arg.startswith("--apikey="):
-		temp, _apikey = arg.split("=")
-	elif arg.startswith("--device="):
-		temp, _device = arg.split("=")
-		
-_socket_port = int(_socket_port)
+
+parser = argparse.ArgumentParser(description='Edisio Daemon for Jeedom plugin')
+parser.add_argument("--device", help="Device", type=str)
+parser.add_argument("--socketport", help="Socketport for server", type=str)
+parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
+parser.add_argument("--macs", help="macs of dottis", type=str)
+parser.add_argument("--apikey", help="Apikey", type=str)
+args = parser.parse_args()
+
+if args.device:
+	_device = args.device
+if args.socketport:
+	_socket_port = int(args.socketport)
+if args.loglevel:
+	_log_level = args.loglevel
+if args.macs:
+	_macs = args.macs
+if args.apikey:
+	_apikey = args.apikey
 
 jeedom_utils.set_log_level(_log_level)
 
