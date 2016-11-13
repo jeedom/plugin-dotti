@@ -27,6 +27,7 @@ from os.path import join
 import json
 import struct
 import random
+import traceback
 import bluepy.btle as btle
 
 try:
@@ -321,4 +322,5 @@ try:
 	listen()
 except Exception,e:
 	logging.error('Fatal error : '+str(e))
+	logging.debug(traceback.format_exc())
 	shutdown()
