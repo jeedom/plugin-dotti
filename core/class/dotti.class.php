@@ -51,7 +51,7 @@ class dotti extends eqLogic {
 			if (@posix_getsid(trim(file_get_contents($pid_file)))) {
 				$return['state'] = 'ok';
 			} else {
-				shell_exec('sudo rm -rf ' . $pid_file . ' 2>&1 > /dev/null;rm -rf ' . $pid_file . ' 2>&1 > /dev/null;');
+				shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null;rm -rf ' . $pid_file . ' 2>&1 > /dev/null;');
 			}
 		}
 		$return['launchable'] = 'ok';
@@ -224,7 +224,7 @@ class dotti extends eqLogic {
 		}
 		ksort($dataMemory);
 		if (file_exists($file)) {
-			shell_exec('sudo rm ' . $file);
+			shell_exec(system::getCmdSudo() . 'rm ' . $file);
 		}
 		file_put_contents($file, json_encode($dataMemory, JSON_FORCE_OBJECT));
 		dotti::refreshTitles();
@@ -252,7 +252,7 @@ class dotti extends eqLogic {
 			}
 		}
 		if (file_exists($file)) {
-			shell_exec('sudo rm ' . $file);
+			shell_exec(system::getCmdSudo() . 'rm ' . $file);
 		}
 		file_put_contents($file, json_encode($dataMemory, JSON_FORCE_OBJECT));
 		dotti::refreshTitles();
@@ -312,7 +312,7 @@ class dotti extends eqLogic {
 		$dataMemory[strtolower($_name)] = $_data;
 		ksort($dataMemory);
 		if (file_exists($file)) {
-			shell_exec('sudo rm ' . $file);
+			shell_exec(system::getCmdSudo() . 'rm ' . $file);
 		}
 		file_put_contents($file, json_encode($dataMemory, JSON_FORCE_OBJECT));
 		dotti::refreshTitles();
