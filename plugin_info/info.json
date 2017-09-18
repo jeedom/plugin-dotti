@@ -8,5 +8,7 @@
 	"category" : "devicecommunication",
 	"hasOwnDeamon" : true,
 	"hasDependency" : true,
-	"mobile" : "panel"
+	"mobile" : "panel",
+	"changelog" : "https://github.com/jeedom/plugin-dotti/blob/stable/doc/#language#/changelog.asciidoc",
+	"documentation" : "https://github.com/jeedom/plugin-dotti/blob/stable/doc/#language#/index.asciidoc"
 }
